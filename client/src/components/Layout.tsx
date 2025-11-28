@@ -26,7 +26,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-    // Calculator placeholder for next stages
     { href: "/calculator", icon: Calculator, label: "Calculadora" }, 
     { href: "/admin", icon: Settings, label: "Administração" },
   ];
