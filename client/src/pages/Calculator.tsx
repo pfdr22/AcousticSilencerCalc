@@ -299,6 +299,8 @@ export default function Calculator() {
                         placeholder="dB" 
                         value={formState.ruido_montante[freq] || ''}
                         className="h-8 text-sm text-center px-1"
+                        type="number"
+                        step="0.1"
                         onChange={(e) => handleNoiseChange(freq, e.target.value)}
                       />
                     </div>

@@ -49,10 +49,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           <div className="font-bold text-xl tracking-tight text-sidebar-primary flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground">
-              SRC
-            </div>
-            <span className="text-sidebar-foreground">France Air</span>
+            <img 
+              src="https://seeklogo.com/images/A/air-france-logo-1210909515-seeklogo.com.png" 
+              alt="France Air Logo" 
+              className="h-8 w-auto object-contain"
+            />
+            <span className="text-sidebar-foreground sr-only">France Air</span>
           </div>
           <button 
             className="ml-auto lg:hidden"
