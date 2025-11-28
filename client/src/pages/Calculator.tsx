@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, ArrowRight, Calculator as CalcIcon } from "lucide-react";
+import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // Types
 type Thickness = 100 | 200 | 300;
@@ -22,31 +24,22 @@ interface CalculatorState {
   espessura_baffles_mm: Thickness;
   numero_baffles: number;
   caudal_m3_h: number;
-  ruido_montante: Record<string, number>; // Hz -> dB (stores the CURRENT mode values)
+  ruido_montante: Record<string, number>; 
   noiseMode: NoiseMode;
 }
 
 const FREQUENCIES = ["63", "125", "250", "500", "1000", "2000", "4000", "8000"];
 
 const A_WEIGHTING: Record<string, number> = {
-  "63": -26.2,
-  "125": -16.1,
-  "250": -8.6,
-  "500": -3.2,
-  "1000": 0,
-  "2000": 1.2,
-  "4000": 1.0,
-  "8000": -1.1
+  "63": -26.2, "125": -16.1, "250": -8.6, "500": -3.2, "1000": 0, "2000": 1.2, "4000": 1.0, "8000": -1.1
 };
 
-// Helper for Logarithmic Sum
 const calculateLogSum = (values: number[]): number => {
   if (values.length === 0) return 0;
   const sum = values.reduce((acc, val) => acc + Math.pow(10, val / 10), 0);
   return Math.round(10 * Math.log10(sum) * 10) / 10;
 };
 
-// Helper for Model Code Generation
 const getThicknessLetter = (t: Thickness): string => {
   const map: Record<number, string> = { 100: 'X', 200: 'Y', 300: 'Z' };
   return map[t] || '?';
@@ -59,7 +52,6 @@ const getBaffleCountLetter = (n: number): string => {
 };
 
 export default function Calculator() {
-  // Form State
   const [formState, setFormState] = useState<CalculatorState>({
     largura_mm: 1200,
     altura_mm: 800,
@@ -68,42 +60,30 @@ export default function Calculator() {
     numero_baffles: 4,
     caudal_m3_h: 5000,
     ruido_montante: {},
-    noiseMode: 'LW' // Default mode
+    noiseMode: 'LW'
   });
 
-  // Derived Calculations
-  const calculations = useMemo(() => {
-    const { 
-      largura_mm, 
-      altura_mm, 
-      espessura_baffles_mm, 
-      numero_baffles, 
-      caudal_m3_h,
-      ruido_montante 
-    } = formState;
+  const [showResults, setShowResults] = useState(false);
+  const [attenuationResult, setAttenuationResult] = useState<AtenuacaoResult | null>(null);
 
+  const calculations = useMemo(() => {
+    const { largura_mm, altura_mm, espessura_baffles_mm, numero_baffles, caudal_m3_h, profundidade_mm } = formState;
     const largura_m = largura_mm / 1000;
     const altura_m = altura_mm / 1000;
     const espessura_m = espessura_baffles_mm / 1000;
     
-    const gap_m = numero_baffles > 0 
-      ? (largura_m - (numero_baffles * espessura_m)) / numero_baffles 
-      : 0;
-
+    const gap_m = numero_baffles > 0 ? (largura_m - (numero_baffles * espessura_m)) / numero_baffles : 0;
     const area_livre_m2 = (largura_m - (numero_baffles * espessura_m)) * altura_m;
-
-    const velocidade_ms = area_livre_m2 > 0 
-      ? (caudal_m3_h / 3600) / area_livre_m2 
-      : 0;
+    const velocidade_ms = area_livre_m2 > 0 ? (caudal_m3_h / 3600) / area_livre_m2 : 0;
 
     const isValidVelocity = velocidade_ms <= 20;
     const hasError = !isValidVelocity || area_livre_m2 <= 0;
 
     const thicknessCode = getThicknessLetter(espessura_baffles_mm);
     const countCode = getBaffleCountLetter(numero_baffles);
-    const modelName = `SRC ${thicknessCode}${countCode} ${largura_mm}X${altura_mm}X${formState.profundidade_mm}`;
+    const modelName = `SRC ${thicknessCode}${countCode} ${largura_mm}X${altura_mm}X${profundidade_mm}`;
 
-    const noiseValues = Object.values(ruido_montante).filter(v => !isNaN(v));
+    const noiseValues = Object.values(formState.ruido_montante).filter(v => !isNaN(v));
     const globalNoise = calculateLogSum(noiseValues);
 
     return {
@@ -117,46 +97,112 @@ export default function Calculator() {
     };
   }, [formState]);
 
+  const handleCalculate = () => {
+    const result = calcularAtenuacao(
+      formState.espessura_baffles_mm,
+      formState.numero_baffles,
+      formState.largura_mm,
+      formState.altura_mm,
+      formState.profundidade_mm
+    );
+    setAttenuationResult(result);
+    setShowResults(true);
+  };
+
   const handleInputChange = (field: keyof CalculatorState, value: any) => {
     setFormState(prev => ({ ...prev, [field]: value }));
+    setShowResults(false); // Reset results on input change
   };
 
   const handleNoiseChange = (hz: string, val: string) => {
     const numVal = parseFloat(val);
     setFormState(prev => ({
       ...prev,
-      ruido_montante: {
-        ...prev.ruido_montante,
-        [hz]: isNaN(numVal) ? 0 : numVal
-      }
+      ruido_montante: { ...prev.ruido_montante, [hz]: isNaN(numVal) ? 0 : numVal }
     }));
   };
 
   const handleModeChange = (newMode: string) => {
     if (newMode === formState.noiseMode) return;
-    
-    // Convert existing values when switching mode
     const currentValues = formState.ruido_montante;
     const newValues: Record<string, number> = {};
-    
     FREQUENCIES.forEach(freq => {
       const val = currentValues[freq];
       if (val !== undefined && !isNaN(val)) {
         const weight = A_WEIGHTING[freq] || 0;
-        // If switching TO LWA: add weight
-        // If switching TO LW: subtract weight
-        newValues[freq] = newMode === 'LWA' 
-          ? Number((val + weight).toFixed(1))
-          : Number((val - weight).toFixed(1));
+        newValues[freq] = newMode === 'LWA' ? Number((val + weight).toFixed(1)) : Number((val - weight).toFixed(1));
       }
     });
-
-    setFormState(prev => ({
-      ...prev,
-      noiseMode: newMode as NoiseMode,
-      ruido_montante: newValues
-    }));
+    setFormState(prev => ({ ...prev, noiseMode: newMode as NoiseMode, ruido_montante: newValues }));
   };
+
+  if (showResults && attenuationResult) {
+    return (
+      <Layout>
+        <div className="space-y-8 pb-20">
+           <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Button variant="outline" size="sm" onClick={() => setShowResults(false)}>← Voltar</Button>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <BarChart3 className="h-6 w-6 text-primary" />
+              </div>
+              Resultados de Atenuação
+            </h1>
+            <p className="text-muted-foreground mt-2 ml-12">
+              Modelo: <span className="font-mono font-bold text-foreground">{calculations.modelName}</span>
+            </p>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Atenuação Estimada por Banda (dB)</CardTitle>
+              <CardDescription>Cálculo baseado na geometria e espessura dos baffles.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
+                    {FREQUENCIES.map(f => <TableHead key={f} className="text-center">{f}</TableHead>)}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">D_est (dB)</TableCell>
+                    {FREQUENCIES.map(f => (
+                      <TableCell key={f} className="text-center font-bold text-primary">
+                        {attenuationResult.bandas[f]?.d_est || '-'}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                   <TableRow className="bg-muted/50">
+                    <TableCell className="font-medium">D_ref (dB)</TableCell>
+                    {FREQUENCIES.map(f => (
+                      <TableCell key={f} className="text-center text-muted-foreground text-xs">
+                        {attenuationResult.bandas[f]?.d_ref || '-'}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+
+              <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-primary">Atenuação Global Estimada</h3>
+                  <p className="text-sm text-muted-foreground">Soma logarítmica das atenuações</p>
+                </div>
+                <div className="text-4xl font-bold text-primary">
+                  {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -174,10 +220,7 @@ export default function Calculator() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Inputs */}
           <div className="lg:col-span-2 space-y-6">
-            
-            {/* Geometria e Caudal */}
             <Card>
               <CardHeader>
                 <CardTitle>Dados de Entrada</CardTitle>
@@ -187,85 +230,46 @@ export default function Calculator() {
                 <div className="flex justify-center bg-muted/30 p-4 rounded-lg border border-border/50">
                    <img 
                      src={silencerDimsImage} 
-                     alt="Esquema de dimensões do silenciador (Largura, Altura, Profundidade)" 
+                     alt="Esquema de dimensões do silenciador" 
                      className="max-h-48 object-contain mix-blend-multiply dark:mix-blend-normal dark:opacity-90"
                    />
                 </div>
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="largura">Largura (mm) <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="largura" 
-                    type="number" 
-                    value={formState.largura_mm} 
-                    onChange={(e) => handleInputChange('largura_mm', Number(e.target.value))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="altura">Altura (mm) <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="altura" 
-                    type="number" 
-                    value={formState.altura_mm} 
-                    onChange={(e) => handleInputChange('altura_mm', Number(e.target.value))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="profundidade">Profundidade (mm) <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="profundidade" 
-                    type="number" 
-                    value={formState.profundidade_mm} 
-                    onChange={(e) => handleInputChange('profundidade_mm', Number(e.target.value))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="caudal">Caudal (m³/h) <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="caudal" 
-                    type="number" 
-                    value={formState.caudal_m3_h} 
-                    onChange={(e) => handleInputChange('caudal_m3_h', Number(e.target.value))}
-                    className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="espessura">Espessura Baffles (mm) <span className="text-destructive">*</span></Label>
-                  <Select 
-                    value={formState.espessura_baffles_mm.toString()} 
-                    onValueChange={(val) => handleInputChange('espessura_baffles_mm', Number(val))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="100">100 mm</SelectItem>
-                      <SelectItem value="200">200 mm</SelectItem>
-                      <SelectItem value="300">300 mm</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="n_baffles">Nº de Baffles <span className="text-destructive">*</span></Label>
-                  <Input 
-                    id="n_baffles" 
-                    type="number" 
-                    min={1}
-                    value={formState.numero_baffles} 
-                    onChange={(e) => handleInputChange('numero_baffles', Number(e.target.value))}
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="largura">Largura (mm) <span className="text-destructive">*</span></Label>
+                    <Input id="largura" type="number" value={formState.largura_mm} onChange={(e) => handleInputChange('largura_mm', Number(e.target.value))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="altura">Altura (mm) <span className="text-destructive">*</span></Label>
+                    <Input id="altura" type="number" value={formState.altura_mm} onChange={(e) => handleInputChange('altura_mm', Number(e.target.value))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="profundidade">Profundidade (mm) <span className="text-destructive">*</span></Label>
+                    <Input id="profundidade" type="number" value={formState.profundidade_mm} onChange={(e) => handleInputChange('profundidade_mm', Number(e.target.value))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="caudal">Caudal (m³/h) <span className="text-destructive">*</span></Label>
+                    <Input id="caudal" type="number" value={formState.caudal_m3_h} onChange={(e) => handleInputChange('caudal_m3_h', Number(e.target.value))} className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="espessura">Espessura Baffles (mm) <span className="text-destructive">*</span></Label>
+                    <Select value={formState.espessura_baffles_mm.toString()} onValueChange={(val) => handleInputChange('espessura_baffles_mm', Number(val))}>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="100">100 mm</SelectItem>
+                        <SelectItem value="200">200 mm</SelectItem>
+                        <SelectItem value="300">300 mm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="n_baffles">Nº de Baffles <span className="text-destructive">*</span></Label>
+                    <Input id="n_baffles" type="number" min={1} value={formState.numero_baffles} onChange={(e) => handleInputChange('numero_baffles', Number(e.target.value))} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Ruído a Montante (Opcional) */}
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -295,21 +299,16 @@ export default function Calculator() {
                     <div key={freq} className="space-y-1">
                       <Label htmlFor={`f-${freq}`} className="text-xs text-muted-foreground text-center block">{freq}</Label>
                       <Input 
-                        id={`f-${freq}`}
-                        placeholder="dB" 
-                        value={formState.ruido_montante[freq] || ''}
-                        className="h-8 text-sm text-center px-1"
-                        onChange={(e) => handleNoiseChange(freq, e.target.value)}
+                        id={`f-${freq}`} placeholder="dB" value={formState.ruido_montante[freq] || ''} 
+                        className="h-8 text-sm text-center px-1" onChange={(e) => handleNoiseChange(freq, e.target.value)} 
                       />
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-
           </div>
 
-          {/* Right Column: Results & Summary */}
           <div className="space-y-6">
             <Card className="border-l-4 border-l-primary shadow-lg">
               <CardHeader>
@@ -317,17 +316,13 @@ export default function Calculator() {
                 <CardDescription>Cálculo em tempo real</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                
-                {/* Model Name Display */}
                 <div className="space-y-1.5 p-4 bg-muted rounded-md border border-border">
                   <Label className="text-xs font-medium text-muted-foreground uppercase">Modelo SRC</Label>
                   <div className="font-mono text-lg font-bold tracking-tight break-all text-primary">
                     {calculations.modelName}
                   </div>
                 </div>
-
                 <Separator />
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Velocidade (m/s)</Label>
@@ -335,53 +330,33 @@ export default function Calculator() {
                       {calculations.velocidade_ms}
                     </div>
                   </div>
-                  
                   <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Área Livre (m²)</Label>
-                    <div className="text-2xl font-bold text-foreground">
-                      {calculations.area_livre_m2}
-                    </div>
+                    <div className="text-2xl font-bold text-foreground">{calculations.area_livre_m2}</div>
                   </div>
                 </div>
-
                 <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Gap Calculado (mm)</Label>
-                    <div className="text-lg font-medium text-foreground">
-                      {calculations.gap_mm}
-                    </div>
+                    <div className="text-lg font-medium text-foreground">{calculations.gap_mm}</div>
                 </div>
-
-                {/* Validation Alert */}
                 {!calculations.isValidVelocity && (
                   <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Velocidade Excessiva</AlertTitle>
-                    <AlertDescription>
-                      A velocidade ultrapassa o limite de 20 m/s. Por favor ajuste as dimensões ou baffles.
-                    </AlertDescription>
+                    <AlertDescription>A velocidade ultrapassa o limite de 20 m/s. Por favor ajuste as dimensões ou baffles.</AlertDescription>
                   </Alert>
                 )}
-
-                {/* Error State for Geometry */}
                 {Number(calculations.area_livre_m2) <= 0 && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Erro Geométrico</AlertTitle>
-                    <AlertDescription>
-                      A área livre é inválida. Verifique o número e espessura dos baffles em relação à largura.
-                    </AlertDescription>
+                    <AlertDescription>A área livre é inválida. Verifique o número e espessura dos baffles em relação à largura.</AlertDescription>
                   </Alert>
                 )}
-
-                <Button 
-                  className="w-full mt-4" 
-                  size="lg"
-                  disabled={calculations.hasError}
-                >
+                <Button className="w-full mt-4" size="lg" disabled={calculations.hasError} onClick={handleCalculate}>
                   Seguinte
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-
               </CardContent>
             </Card>
           </div>
