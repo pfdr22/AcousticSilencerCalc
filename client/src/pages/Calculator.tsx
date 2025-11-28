@@ -13,7 +13,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
 import { calcularRuidoRegenerado, RegeneratedNoiseResult } from "@/core/regeneratedNoise";
+import { calcularRuidoJusante, DownstreamNoiseResult } from "@/core/downstreamNoise";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Types
 type Thickness = 100 | 200 | 300;
@@ -69,6 +71,7 @@ export default function Calculator() {
   const [attenuationResult, setAttenuationResult] = useState<AtenuacaoResult | null>(null);
   const [pressureLossResult, setPressureLossResult] = useState<PressureLossResult | null>(null);
   const [regeneratedNoiseResult, setRegeneratedNoiseResult] = useState<RegeneratedNoiseResult | null>(null);
+  const [downstreamNoiseResult, setDownstreamNoiseResult] = useState<DownstreamNoiseResult | null>(null);
 
   const calculations = useMemo(() => {
     const { largura_mm, altura_mm, espessura_baffles_mm, numero_baffles, caudal_m3_h, profundidade_mm } = formState;
@@ -127,9 +130,17 @@ export default function Calculator() {
       formState.espessura_baffles_mm
     );
 
+    const downNoise = calcularRuidoJusante(
+      formState.ruido_montante,
+      attResult.bandas,
+      regenNoise.bandas,
+      formState.noiseMode
+    );
+
     setAttenuationResult(attResult);
     setPressureLossResult(pressResult);
     setRegeneratedNoiseResult(regenNoise);
+    setDownstreamNoiseResult(downNoise);
     setShowResults(true);
   };
 
@@ -159,6 +170,17 @@ export default function Calculator() {
     });
     setFormState(prev => ({ ...prev, noiseMode: newMode as NoiseMode, ruido_montante: newValues }));
   };
+
+  // Prepare chart data
+  const chartData = useMemo(() => {
+    if (!downstreamNoiseResult) return [];
+    return FREQUENCIES.map(f => ({
+      name: f,
+      Upstream: downstreamNoiseResult.bandas[f]?.L_up || 0,
+      Downstream: downstreamNoiseResult.bandas[f]?.L_down || 0,
+      Regenerated: downstreamNoiseResult.bandas[f]?.L_reg || 0
+    }));
+  }, [downstreamNoiseResult]);
 
   if (showResults && attenuationResult) {
     return (
@@ -247,6 +269,91 @@ export default function Calculator() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* NEW DOWNSTREAM NOISE SECTION */}
+              {downstreamNoiseResult && (
+                 <Card className="mt-8 border-blue-200 dark:border-blue-800 shadow-md">
+                   <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20 pb-4">
+                     <CardTitle className="text-blue-700 dark:text-blue-400">Ruído a Jusante (L_down)</CardTitle>
+                     <CardDescription>Nível sonoro final após silenciador, considerando atenuação e ruído regenerado.</CardDescription>
+                   </CardHeader>
+                   <CardContent className="pt-6">
+                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                       <div className="xl:col-span-2">
+                         <Table>
+                           <TableHeader>
+                             <TableRow>
+                               <TableHead className="w-[100px]">Frequência</TableHead>
+                               {FREQUENCIES.map(f => <TableHead key={f} className="text-center text-xs">{f}</TableHead>)}
+                             </TableRow>
+                           </TableHeader>
+                           <TableBody>
+                             <TableRow>
+                               <TableCell className="font-medium text-xs text-muted-foreground">L_up (Entrada)</TableCell>
+                               {FREQUENCIES.map(f => (
+                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                   {downstreamNoiseResult.bandas[f]?.L_up.toFixed(1)}
+                                 </TableCell>
+                               ))}
+                             </TableRow>
+                             <TableRow>
+                               <TableCell className="font-medium text-xs text-muted-foreground">D_est (Atenuação)</TableCell>
+                               {FREQUENCIES.map(f => (
+                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                   -{downstreamNoiseResult.bandas[f]?.D_est.toFixed(1)}
+                                 </TableCell>
+                               ))}
+                             </TableRow>
+                             <TableRow>
+                               <TableCell className="font-medium text-xs text-muted-foreground">L_reg (Regenerado)</TableCell>
+                               {FREQUENCIES.map(f => (
+                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                   {downstreamNoiseResult.bandas[f]?.L_reg.toFixed(1)}
+                                 </TableCell>
+                               ))}
+                             </TableRow>
+                             <TableRow className="bg-blue-50/50 dark:bg-blue-900/20 border-t-2 border-blue-100 dark:border-blue-800">
+                               <TableCell className="font-bold text-blue-700 dark:text-blue-400">L_down (Saída)</TableCell>
+                               {FREQUENCIES.map(f => (
+                                 <TableCell key={f} className="text-center font-bold text-blue-700 dark:text-blue-400">
+                                   {downstreamNoiseResult.bandas[f]?.L_down.toFixed(1)}
+                                 </TableCell>
+                               ))}
+                             </TableRow>
+                           </TableBody>
+                         </Table>
+                       </div>
+                       
+                       <div className="h-[250px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800">
+                         <ResponsiveContainer width="100%" height="100%">
+                           <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
+                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                             <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
+                             <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} width={30} />
+                             <Tooltip 
+                               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                               labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
+                             />
+                             <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                             <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" />
+                             <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" />
+                             <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" />
+                           </LineChart>
+                         </ResponsiveContainer>
+                       </div>
+                     </div>
+
+                     <div className="mt-6 flex justify-end items-center gap-4">
+                        <div className="text-right">
+                          <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">L_down Global</span>
+                          <span className="text-3xl font-bold font-mono text-blue-600 dark:text-blue-400">
+                            {downstreamNoiseResult.L_down_global} <span className="text-lg font-sans font-normal text-muted-foreground">dB{formState.noiseMode === 'LWA' ? '(A)' : ''}</span>
+                          </span>
+                        </div>
+                     </div>
+                   </CardContent>
+                 </Card>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 {/* Atenuação Global */}
