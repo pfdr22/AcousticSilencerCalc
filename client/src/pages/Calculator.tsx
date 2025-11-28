@@ -99,7 +99,17 @@ export default function Calculator() {
     };
   }, [formState]);
 
+import { calcularRuidoRegenerado, RegeneratedNoiseResult } from "@/core/regeneratedNoise";
+
+// ... existing imports ...
+
+export default function Calculator() {
+  // ... existing state ...
+  const [regeneratedNoiseResult, setRegeneratedNoiseResult] = useState<RegeneratedNoiseResult | null>(null);
+
   const handleCalculate = () => {
+    // ... existing calculations ...
+    
     const attResult = calcularAtenuacao(
       formState.espessura_baffles_mm,
       formState.numero_baffles,
@@ -117,10 +127,85 @@ export default function Calculator() {
       formState.caudal_m3_h
     );
 
+    const regenNoise = calcularRuidoRegenerado(
+      formState.caudal_m3_h,
+      formState.largura_mm,
+      formState.altura_mm,
+      formState.numero_baffles,
+      formState.espessura_baffles_mm
+    );
+
     setAttenuationResult(attResult);
     setPressureLossResult(pressResult);
+    setRegeneratedNoiseResult(regenNoise);
     setShowResults(true);
   };
+
+  // ... existing functions ...
+
+  if (showResults && attenuationResult) {
+    return (
+      <Layout>
+        <div className="space-y-8 pb-20">
+           {/* ... existing header ... */}
+           {/* ... existing attenuation table ... */}
+
+           <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Ruído Regenerado (Flow Noise)</CardTitle>
+              <CardDescription>Nível de potência sonora gerado pelo escoamento do ar (VDI 2081).</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
+                    {FREQUENCIES.map(f => <TableHead key={f} className="text-center">{f}</TableHead>)}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">LwA (dB)</TableCell>
+                    {FREQUENCIES.map(f => (
+                      <TableCell key={f} className="text-center font-mono text-sm">
+                         {regeneratedNoiseResult?.bandas[f]?.L_w_A_band?.toFixed(1) || '-'}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  <TableRow className="bg-muted/50">
+                    <TableCell className="font-medium text-muted-foreground">Lw Linear (dB)</TableCell>
+                    {FREQUENCIES.map(f => (
+                      <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                         {regeneratedNoiseResult?.bandas[f]?.L_w_okt?.toFixed(1) || '-'}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+
+              <div className="mt-6 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">Nível Sonoro Global Regenerado</h3>
+                  <p className="text-sm text-muted-foreground">LwA Global (Ponderado A)</p>
+                </div>
+                <div className="text-3xl font-bold font-mono">
+                  {regeneratedNoiseResult?.L_w_A_global} <span className="text-xl font-sans font-normal text-muted-foreground">dB(A)</span>
+                </div>
+              </div>
+            </CardContent>
+           </Card>
+           
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                {/* ... existing global cards ... */}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+  // ... rest of component
+
 
   const handleInputChange = (field: keyof CalculatorState, value: any) => {
     setFormState(prev => ({ ...prev, [field]: value }));
@@ -192,6 +277,50 @@ export default function Calculator() {
                   </TableRow>
                 </TableBody>
               </Table>
+
+              <Card className="mt-8 border-slate-200 dark:border-slate-800 shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Ruído Regenerado (Flow Noise)</CardTitle>
+                  <CardDescription>Potência sonora gerada pelo escoamento (VDI 2081).</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
+                        {FREQUENCIES.map(f => <TableHead key={f} className="text-center h-8">{f}</TableHead>)}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium py-2">LwA (dB)</TableCell>
+                        {FREQUENCIES.map(f => (
+                          <TableCell key={f} className="text-center font-mono text-sm py-2">
+                            {regeneratedNoiseResult?.bandas[f]?.L_w_A_band?.toFixed(1) || '-'}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow className="bg-muted/30">
+                        <TableCell className="font-medium text-muted-foreground py-2 text-xs">Lw Linear (dB)</TableCell>
+                        {FREQUENCIES.map(f => (
+                          <TableCell key={f} className="text-center text-xs text-muted-foreground py-2">
+                            {regeneratedNoiseResult?.bandas[f]?.L_w_okt?.toFixed(1) || '-'}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+
+                  <div className="mt-4 flex justify-end">
+                    <div className="text-right">
+                      <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">LwA Global</span>
+                      <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
+                        {regeneratedNoiseResult?.L_w_A_global} <span className="text-sm font-sans font-normal text-muted-foreground">dB(A)</span>
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 {/* Atenuação Global */}
