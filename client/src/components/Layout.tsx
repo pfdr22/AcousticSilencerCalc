@@ -12,6 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import { api } from "../api/mockApi";
 import { Button } from "@/components/ui/button";
+import logoImage from "@assets/image_1764364708706.png";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -48,16 +49,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         `}
       >
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-2.5">
-            {/* Symbol */}
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-sm ring-1 ring-white/10">
-              <span className="font-bold text-primary-foreground text-lg">FA</span>
-            </div>
-            {/* Text */}
-            <div className="flex flex-col justify-center">
-              <span className="font-bold text-base leading-none text-sidebar-foreground tracking-tight">France Air</span>
-              <span className="text-[10px] font-medium text-sidebar-foreground/60 uppercase tracking-wider mt-0.5">Software SRC</span>
-            </div>
+          <div className="flex items-center gap-2.5 w-full">
+            <img 
+              src={logoImage} 
+              alt="France Air Logo" 
+              className="h-10 w-auto object-contain" 
+            />
           </div>
           <button 
             className="ml-auto lg:hidden"
