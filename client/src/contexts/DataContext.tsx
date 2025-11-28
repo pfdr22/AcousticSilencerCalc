@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { PRICING_DB } from '@/core/pricing_db';
-import { MOCK_DB } from '@/core/mock_db'; // Import attenuation data
+import { mockRefAtenuacao } from '@/db/mock_db'; // Import attenuation data
 
 export interface AppData {
   pricing: typeof PRICING_DB;
-  attenuation: typeof MOCK_DB;
+  attenuation: typeof mockRefAtenuacao;
   constants: {
     pressure_loss: {
       a1: number; a2: number; b1: number; b2: number;
@@ -24,7 +24,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>({
     pricing: JSON.parse(JSON.stringify(PRICING_DB)), 
-    attenuation: JSON.parse(JSON.stringify(MOCK_DB)),
+    attenuation: JSON.parse(JSON.stringify(mockRefAtenuacao)),
     constants: {
       pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0 } 
     }
@@ -51,7 +51,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const updateAttenuation = (id: number, value: number) => {
      const newData = { ...data };
-     const index = newData.attenuation.findIndex(item => item.id === id);
+     const index = newData.attenuation.findIndex((item: { id: number }) => item.id === id);
      if (index !== -1) {
        newData.attenuation[index].d_ref_db = value;
        saveToStorage(newData);
@@ -61,7 +61,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const resetData = () => {
     const newData = {
       pricing: JSON.parse(JSON.stringify(PRICING_DB)),
-      attenuation: JSON.parse(JSON.stringify(MOCK_DB)),
+      attenuation: JSON.parse(JSON.stringify(mockRefAtenuacao)),
       constants: {
         pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0 } 
       }
@@ -81,4 +81,5 @@ export function useData() {
   if (!context) throw new Error('useData must be used within DataProvider');
   return context;
 }
+
 
