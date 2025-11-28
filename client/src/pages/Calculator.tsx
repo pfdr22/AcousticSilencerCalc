@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowRight, Calculator as CalcIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import silencerDimsImage from "@assets/image_1764355007570.png";
 
 // Types
 type Thickness = 100 | 200 | 300;
@@ -149,7 +150,16 @@ export default function Calculator() {
                 <CardTitle>Dados de Entrada</CardTitle>
                 <CardDescription>Dimensões do silenciador e condições de operação.</CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardContent className="space-y-6">
+                <div className="flex justify-center bg-muted/30 p-4 rounded-lg border border-border/50">
+                   <img 
+                     src={silencerDimsImage} 
+                     alt="Esquema de dimensões do silenciador (Largura, Altura, Profundidade)" 
+                     className="max-h-48 object-contain mix-blend-multiply dark:mix-blend-normal dark:opacity-90"
+                   />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="largura">Largura (mm) <span className="text-destructive">*</span></Label>
                   <Input 
@@ -217,6 +227,7 @@ export default function Calculator() {
                     value={formState.numero_baffles} 
                     onChange={(e) => handleInputChange('numero_baffles', Number(e.target.value))}
                   />
+                </div>
                 </div>
               </CardContent>
             </Card>
