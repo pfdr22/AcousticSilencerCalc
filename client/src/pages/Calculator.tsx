@@ -14,8 +14,10 @@ import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
 import { calcularRuidoRegenerado, RegeneratedNoiseResult } from "@/core/regeneratedNoise";
 import { calcularRuidoJusante, DownstreamNoiseResult } from "@/core/downstreamNoise";
+import { calcular_preco_final, FinalPriceResult } from "@/core/pricing";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Types
 type Thickness = 100 | 200 | 300;
@@ -72,6 +74,7 @@ export default function Calculator() {
   const [pressureLossResult, setPressureLossResult] = useState<PressureLossResult | null>(null);
   const [regeneratedNoiseResult, setRegeneratedNoiseResult] = useState<RegeneratedNoiseResult | null>(null);
   const [downstreamNoiseResult, setDownstreamNoiseResult] = useState<DownstreamNoiseResult | null>(null);
+  const [finalPriceResult, setFinalPriceResult] = useState<FinalPriceResult | null>(null);
 
   const calculations = useMemo(() => {
     const { largura_mm, altura_mm, espessura_baffles_mm, numero_baffles, caudal_m3_h, profundidade_mm } = formState;
@@ -137,10 +140,21 @@ export default function Calculator() {
       formState.noiseMode
     );
 
+    const priceResult = calcular_preco_final(
+      {
+        width_mm: formState.largura_mm,
+        height_mm: formState.altura_mm,
+        depth_mm: formState.profundidade_mm
+      },
+      formState.numero_baffles,
+      formState.espessura_baffles_mm
+    );
+
     setAttenuationResult(attResult);
     setPressureLossResult(pressResult);
     setRegeneratedNoiseResult(regenNoise);
     setDownstreamNoiseResult(downNoise);
+    setFinalPriceResult(priceResult);
     setShowResults(true);
   };
 
@@ -380,6 +394,60 @@ export default function Calculator() {
                   </div>
                 )}
               </div>
+
+              {/* PREÇO FINAL */}
+              {finalPriceResult && (
+                <div className="mt-8">
+                   <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div>
+                      <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Final Estimado</h3>
+                      <p className="text-sm text-muted-foreground">Inclui materiais, mão de obra e custos indiretos.</p>
+                    </div>
+                    <div className="text-5xl font-bold text-green-700 dark:text-green-400">
+                      {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
+                    </div>
+                  </div>
+
+                  <Accordion type="single" collapsible className="w-full mt-4">
+                    <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
+                      <AccordionTrigger className="hover:no-underline py-3">
+                        <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-4 pt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
+                              <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
+                              <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
+                            </div>
+                            <div className="flex justify-between font-medium pt-1 border-t">
+                              <span>Subtotal Direto:</span>
+                              <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Custos Indiretos:</span>
+                              <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Margem de Lucro:</span>
+                              <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
