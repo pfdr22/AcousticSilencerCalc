@@ -9,9 +9,11 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowRight, Calculator as CalcIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Types
 type Thickness = 100 | 200 | 300;
+type NoiseMode = 'LW' | 'LWA';
 
 interface CalculatorState {
   largura_mm: number;
@@ -20,10 +22,22 @@ interface CalculatorState {
   espessura_baffles_mm: Thickness;
   numero_baffles: number;
   caudal_m3_h: number;
-  ruido_montante: Record<string, number>; // Hz -> dB
+  ruido_montante: Record<string, number>; // Hz -> dB (stores the CURRENT mode values)
+  noiseMode: NoiseMode;
 }
 
 const FREQUENCIES = ["63", "125", "250", "500", "1000", "2000", "4000", "8000"];
+
+const A_WEIGHTING: Record<string, number> = {
+  "63": -26.2,
+  "125": -16.1,
+  "250": -8.6,
+  "500": -3.2,
+  "1000": 0,
+  "2000": 1.2,
+  "4000": 1.0,
+  "8000": -1.1
+};
 
 // Helper for Logarithmic Sum
 const calculateLogSum = (values: number[]): number => {
@@ -40,11 +54,8 @@ const getThicknessLetter = (t: Thickness): string => {
 
 const getBaffleCountLetter = (n: number): string => {
   if (n < 1) return '?';
-  // A=1, B=2... Z=26. After that AA, AB? Usually these tables stop around Z. 
-  // Assuming simplified A-Z for now as per requirement "Letra nº baffles: A=1...".
-  // ASCII 'A' is 65.
   if (n <= 26) return String.fromCharCode(64 + n);
-  return '?'; // Out of range for simple letter code
+  return '?'; 
 };
 
 export default function Calculator() {
@@ -56,7 +67,8 @@ export default function Calculator() {
     espessura_baffles_mm: 200,
     numero_baffles: 4,
     caudal_m3_h: 5000,
-    ruido_montante: {}
+    ruido_montante: {},
+    noiseMode: 'LW' // Default mode
   });
 
   // Derived Calculations
@@ -74,15 +86,12 @@ export default function Calculator() {
     const altura_m = altura_mm / 1000;
     const espessura_m = espessura_baffles_mm / 1000;
     
-    // User formula: gap_m = (largura_m - numero_baffles * espessura_m) / numero_baffles
     const gap_m = numero_baffles > 0 
       ? (largura_m - (numero_baffles * espessura_m)) / numero_baffles 
       : 0;
 
-    // User formula: area_livre_m2 = (largura_m - numero_baffles * espessura_m) * altura_m
     const area_livre_m2 = (largura_m - (numero_baffles * espessura_m)) * altura_m;
 
-    // User formula: velocidade_ms = (caudal_m3_h/3600) / area_livre_m2
     const velocidade_ms = area_livre_m2 > 0 
       ? (caudal_m3_h / 3600) / area_livre_m2 
       : 0;
@@ -90,12 +99,10 @@ export default function Calculator() {
     const isValidVelocity = velocidade_ms <= 20;
     const hasError = !isValidVelocity || area_livre_m2 <= 0;
 
-    // Model Name Generation
     const thicknessCode = getThicknessLetter(espessura_baffles_mm);
     const countCode = getBaffleCountLetter(numero_baffles);
     const modelName = `SRC ${thicknessCode}${countCode} ${largura_mm}X${altura_mm}X${formState.profundidade_mm}`;
 
-    // Logarithmic Sum of Noise
     const noiseValues = Object.values(ruido_montante).filter(v => !isNaN(v));
     const globalNoise = calculateLogSum(noiseValues);
 
@@ -122,6 +129,32 @@ export default function Calculator() {
         ...prev.ruido_montante,
         [hz]: isNaN(numVal) ? 0 : numVal
       }
+    }));
+  };
+
+  const handleModeChange = (newMode: string) => {
+    if (newMode === formState.noiseMode) return;
+    
+    // Convert existing values when switching mode
+    const currentValues = formState.ruido_montante;
+    const newValues: Record<string, number> = {};
+    
+    FREQUENCIES.forEach(freq => {
+      const val = currentValues[freq];
+      if (val !== undefined && !isNaN(val)) {
+        const weight = A_WEIGHTING[freq] || 0;
+        // If switching TO LWA: add weight
+        // If switching TO LW: subtract weight
+        newValues[freq] = newMode === 'LWA' 
+          ? Number((val + weight).toFixed(1))
+          : Number((val - weight).toFixed(1));
+      }
+    });
+
+    setFormState(prev => ({
+      ...prev,
+      noiseMode: newMode as NoiseMode,
+      ruido_montante: newValues
     }));
   };
 
@@ -240,9 +273,19 @@ export default function Calculator() {
                     <CardTitle>Ruído a Montante</CardTitle>
                     <CardDescription>Espectro sonoro na entrada (opcional).</CardDescription>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs font-medium uppercase text-muted-foreground block">Nível Global</span>
-                    <span className="text-2xl font-bold font-mono text-primary">{calculations.globalNoise} <span className="text-sm font-sans text-muted-foreground">dB</span></span>
+                  <div className="flex items-center gap-4">
+                    <Tabs value={formState.noiseMode} onValueChange={handleModeChange} className="h-8">
+                      <TabsList className="h-8">
+                        <TabsTrigger value="LW" className="text-xs px-3 h-6">LW (Linear)</TabsTrigger>
+                        <TabsTrigger value="LWA" className="text-xs px-3 h-6">LWA (Ponderado A)</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                    <div className="text-right min-w-[100px]">
+                      <span className="text-xs font-medium uppercase text-muted-foreground block">Nível Global</span>
+                      <span className="text-2xl font-bold font-mono text-primary">
+                        {calculations.globalNoise} <span className="text-sm font-sans text-muted-foreground">dB{formState.noiseMode === 'LWA' ? '(A)' : ''}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
@@ -254,6 +297,7 @@ export default function Calculator() {
                       <Input 
                         id={`f-${freq}`}
                         placeholder="dB" 
+                        value={formState.ruido_montante[freq] || ''}
                         className="h-8 text-sm text-center px-1"
                         onChange={(e) => handleNoiseChange(freq, e.target.value)}
                       />
