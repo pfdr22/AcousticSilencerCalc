@@ -173,15 +173,7 @@ export default function Calculator() {
                     <TableCell className="font-medium">D_est (dB)</TableCell>
                     {FREQUENCIES.map(f => (
                       <TableCell key={f} className="text-center font-bold text-primary">
-                        {attenuationResult.bandas[f]?.d_est || '-'}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                   <TableRow className="bg-muted/50">
-                    <TableCell className="font-medium">D_ref (dB)</TableCell>
-                    {FREQUENCIES.map(f => (
-                      <TableCell key={f} className="text-center text-muted-foreground text-xs">
-                        {attenuationResult.bandas[f]?.d_ref || '-'}
+                        {attenuationResult.bandas[f]?.d_est?.toFixed(1) || '-'}
                       </TableCell>
                     ))}
                   </TableRow>
