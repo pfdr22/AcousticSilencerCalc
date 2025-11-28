@@ -6,11 +6,7 @@ import {
   User 
 } from '../types/schema';
 
-// Updated Mock Data based on the Excel Image for D_ref (CLA)
-// 100mm: 2, 4, 11, 28, 43, 50, 38, 25
-// 200mm: 5, 7, 16, 28, 35, 38, 23, 13
-// 300mm: 2, 8, 16, 23, 28, 24, 16, 11
-
+// Mock Data for D_ref (CLA)
 export const mockRefAtenuacao: RefAtenuacao[] = [
   // 100mm
   { id: 1, espessura_mm: 100, frequencia_hz: 63, d_ref_db: 2 },
@@ -43,9 +39,11 @@ export const mockRefAtenuacao: RefAtenuacao[] = [
   { id: 24, espessura_mm: 300, frequencia_hz: 8000, d_ref_db: 11 },
 ];
 
+// Updated VDI 2081 Constants (Table 17)
 export const mockConstantesVdi: ConstantesVdiPerdaCarga[] = [
-  { id: 1, espessura_mm: 100, a1: 0.5, a2: 0.1, b1: 1.2, b2: 0.8 },
-  { id: 2, espessura_mm: 200, a1: 0.6, a2: 0.15, b1: 1.3, b2: 0.9 },
+  { id: 1, espessura_mm: 100, a1: 0.235, a2: 0.017, b1: -2.78, b2: -2.70 },
+  { id: 2, espessura_mm: 200, a1: 0.255, a2: 0.015, b1: -2.82, b2: -2.91 },
+  { id: 3, espessura_mm: 300, a1: 0.294, a2: 0.0167, b1: -2.83, b2: -2.95 },
 ];
 
 export const mockPrecosCaixa: PrecoUnitarioCaixa[] = [

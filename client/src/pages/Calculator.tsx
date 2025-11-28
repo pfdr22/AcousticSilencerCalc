@@ -10,6 +10,7 @@ import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3 } from "luci
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -65,6 +66,7 @@ export default function Calculator() {
 
   const [showResults, setShowResults] = useState(false);
   const [attenuationResult, setAttenuationResult] = useState<AtenuacaoResult | null>(null);
+  const [pressureLossResult, setPressureLossResult] = useState<PressureLossResult | null>(null);
 
   const calculations = useMemo(() => {
     const { largura_mm, altura_mm, espessura_baffles_mm, numero_baffles, caudal_m3_h, profundidade_mm } = formState;
@@ -98,14 +100,25 @@ export default function Calculator() {
   }, [formState]);
 
   const handleCalculate = () => {
-    const result = calcularAtenuacao(
+    const attResult = calcularAtenuacao(
       formState.espessura_baffles_mm,
       formState.numero_baffles,
       formState.largura_mm,
       formState.altura_mm,
       formState.profundidade_mm
     );
-    setAttenuationResult(result);
+    
+    const pressResult = calcularPerdaCarga(
+      formState.espessura_baffles_mm,
+      formState.numero_baffles,
+      formState.largura_mm,
+      formState.altura_mm,
+      formState.profundidade_mm,
+      formState.caudal_m3_h
+    );
+
+    setAttenuationResult(attResult);
+    setPressureLossResult(pressResult);
     setShowResults(true);
   };
 
@@ -180,14 +193,30 @@ export default function Calculator() {
                 </TableBody>
               </Table>
 
-              <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-primary">Atenuação Global Estimada</h3>
-                  <p className="text-sm text-muted-foreground">Soma logarítmica das atenuações</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                {/* Atenuação Global */}
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-primary">Atenuação Global</h3>
+                    <p className="text-sm text-muted-foreground">Soma logarítmica</p>
+                  </div>
+                  <div className="text-4xl font-bold text-primary">
+                    {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
+                  </div>
                 </div>
-                <div className="text-4xl font-bold text-primary">
-                  {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
-                </div>
+
+                {/* Perda de Carga */}
+                {pressureLossResult && (
+                  <div className="p-4 bg-orange-500/5 rounded-lg border border-orange-500/20 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-orange-600 dark:text-orange-400">Perda de Carga (Δp)</h3>
+                      <p className="text-sm text-muted-foreground">Coeficiente ζ: {pressureLossResult.zeta}</p>
+                    </div>
+                    <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
+                      {pressureLossResult.delta_p_Pa} <span className="text-xl font-normal text-muted-foreground">Pa</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
