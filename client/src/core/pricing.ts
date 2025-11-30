@@ -53,7 +53,7 @@ export function calcular_preco_caixa(
   // Area Chapa 0.8 (Box Walls)
   // Formula: (2*P*(H+35) + 2*P*(L+35)) / 1000000
   const area_walls_m2 = (2 * P * (H + 35) + 2 * P * (L + 35)) / 1000000;
-  const qtd_chapa08 = area_walls_m2 * 1.2; // +20% waste
+  const qtd_chapa08 = area_walls_m2 * 1.25; // +25% waste (Standard industry practice)
 
   // Perfil P30
   // Formula: 4 * (L + H) / 1000
@@ -124,7 +124,7 @@ export function calcular_preco_atenuador_baffle(
   // Quantities
   // Wool: 2 * H * P * N / 1000000
   const area_la_raw = (2 * H * P * N) / 1000000;
-  const qtd_la = area_la_raw * 1.05; // 5% waste
+  const qtd_la = area_la_raw * 1.10; // 10% waste
 
   // Frame (Chapa 0.6)
   // Formula: N * (2*H + 2*P) * (T + 40) / 1000000
@@ -132,7 +132,7 @@ export function calcular_preco_atenuador_baffle(
   const perimeter_mm = 2 * H + 2 * P;
   const frame_width_mm = T + 40; 
   const area_frame_raw = (N * perimeter_mm * frame_width_mm) / 1000000;
-  const qtd_chapa06 = area_frame_raw * 1.2; // +20% waste
+  const qtd_chapa06 = area_frame_raw * 1.25; // +25% waste
 
   // Costs
   const c_la = qtd_la * p_la;
