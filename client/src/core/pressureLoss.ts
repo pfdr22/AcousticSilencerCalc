@@ -44,28 +44,25 @@ export const calcularPerdaCarga = (
 
   const { a1, a2, b1, b2 } = constants;
 
-  // 5. Calculate Zeta (ζ) - VDI 2081 Equation (59)
-  // ζ = a1 * [s / (s + dk)]^b1 + a2 * [s / (s + dk)]^b2 * L / dh
-  // Note: Users formula suggestion was likely a transcription error as it omitted Length and used different terms.
-  // We stick to the authoritative VDI 2081 Eq 59 from the provided image.
-  const ratio = s / (s + d_k);
-  const term1 = a1 * Math.pow(ratio, b1);
-  const term2 = a2 * Math.pow(ratio, b2) * (L / d_h);
-  const zeta = term1 + term2;
+  // 5. Calculate Zeta (ζ) - VDI 2081 (Modified Formula as requested)
+  // ratio = (s + dh) / s
+  // zeta = a1 * (ratio ** 2) + b1 * ratio
+  const ratio = (s + d_h) / s;
+  const zeta = a1 * Math.pow(ratio, 2) + b1 * ratio;
 
   // 6. Calculate Velocity (v)
-  // v = Q / (n * s * s_h)
+  // v = Q / A_livre
   const area_livre = numero_baffles * s * s_h;
   const velocity = area_livre > 0 ? (caudal_m3_h / 3600) / area_livre : 0;
 
-  // 7. Calculate Total Pressure Difference (Δpt) - VDI 2081 Equation (57)
-  // Δpt = ζ * (rho / 2) * v^2
+  // 7. Calculate Base Pressure Drop (Δp)
+  // delta_p = zeta * 0.5 * rho * (v ** 2)
   const rho = 1.2; // Air density (kg/m3)
-  const delta_p_vdi = zeta * 0.5 * rho * Math.pow(velocity, 2);
+  const delta_p_base = zeta * 0.5 * rho * Math.pow(velocity, 2);
 
   // 8. Apply Aerodynamic Profile Correction
-  // Multiply by factor (default 0.5) to considering aerodynamic profile
-  const delta_p_final = delta_p_vdi * aerodynamic_factor;
+  // Apply factor at the end (default 0.5)
+  const delta_p_final = delta_p_base * aerodynamic_factor;
 
   return {
     zeta: Number(zeta.toFixed(2)),
