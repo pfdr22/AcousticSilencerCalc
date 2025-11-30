@@ -65,10 +65,14 @@ export const calcularPerdaCarga = (
   // Calculate Delta P (Δp)
   // Δp = 0.5 * rho * v^2 * ζ
   const rho = 1.2; // Air density kg/m3
-  const delta_p_Pa = 0.5 * rho * Math.pow(velocity, 2) * zeta;
+  const delta_p_Pa_raw = 0.5 * rho * Math.pow(velocity, 2) * zeta;
+
+  // Apply aerodynamic profile factor (0.5) as requested
+  const delta_p_Pa = delta_p_Pa_raw * 0.5;
 
   return {
     zeta: Number(zeta.toFixed(2)),
     delta_p_Pa: Math.round(delta_p_Pa) // Integer Pascal usually
   };
 };
+
