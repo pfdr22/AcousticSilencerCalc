@@ -390,6 +390,9 @@ export default function Calculator() {
                     <div>
                       <h3 className="font-semibold text-orange-600 dark:text-orange-400">Perda de Carga (Δp)</h3>
                       <p className="text-sm text-muted-foreground">Coeficiente ζ: {pressureLossResult.zeta}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Fator Aero: {data.constants.pressure_loss.aerodynamic_factor}
+                      </p>
                     </div>
                     <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
                       {pressureLossResult.delta_p_Pa} <span className="text-xl font-normal text-muted-foreground">Pa</span>

@@ -60,11 +60,12 @@ export const calcularPerdaCarga = (
   // delta_p_base = zeta * 0.5 * rho * (v ** 2)
   const delta_p_base = zeta * 0.5 * rho * Math.pow(velocity, 2);
   
-  // Return base pressure drop without aerodynamic correction as requested
-  // User said: "Só depois disto estar correto voltaremos a aplicar um fator aerodinâmico."
+  // Apply Aerodynamic Profile Correction
+  // delta_p_final = delta_p_base * aerodynamic_factor
+  const delta_p_final = delta_p_base * aerodynamic_factor;
   
   return {
     zeta: Number(zeta.toFixed(2)),
-    delta_p_Pa: Math.round(delta_p_base)
+    delta_p_Pa: Math.round(delta_p_final)
   };
 };
