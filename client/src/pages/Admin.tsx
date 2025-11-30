@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Save } from "lucide-react";
+import { RefreshCw, Save, Settings2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 export default function Admin() {
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
-  const { data, updatePricing, updateAttenuation, resetData } = useData();
+  const { data, updatePricing, updateAttenuation, updateConstant, resetData } = useData();
 
   if (!user || user.role !== 'admin') {
     setLocation('/admin/login');
@@ -39,7 +39,7 @@ export default function Admin() {
           <TabsList>
             <TabsTrigger value="precos">Preços Unitários</TabsTrigger>
             <TabsTrigger value="atenuacao">Atenuação (Ref)</TabsTrigger>
-            {/* <TabsTrigger value="constantes">Constantes VDI</TabsTrigger> */}
+            <TabsTrigger value="constantes">Constantes de Cálculo</TabsTrigger>
           </TabsList>
 
           <TabsContent value="precos" className="space-y-4">
@@ -184,8 +184,44 @@ export default function Admin() {
                 </CardContent>
              </Card>
           </TabsContent>
+
+          <TabsContent value="constantes">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings2 className="w-5 h-5" />
+                  Parâmetros de Perda de Carga
+                </CardTitle>
+                <CardDescription>Ajuste de coeficientes aerodinâmicos e constantes de cálculo.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between border p-4 rounded-lg bg-muted/20">
+                  <div className="space-y-1">
+                    <Label className="text-base font-semibold">Fator Aerodinâmico (Baffles)</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Coeficiente aplicado à perda de carga total para compensar o perfil aerodinâmico das células.
+                      <br/>
+                      <span className="text-xs opacity-70">Valor padrão: 0.5 (Reduz a perda de carga em 50%)</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      type="number" 
+                      step="0.05"
+                      min="0.1"
+                      max="2.0"
+                      className="w-24 text-right font-mono"
+                      value={data.constants.pressure_loss.aerodynamic_factor}
+                      onChange={(e) => updateConstant('pressure_loss', 'aerodynamic_factor', Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
   );
 }
+

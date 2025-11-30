@@ -8,6 +8,7 @@ export interface AppData {
   constants: {
     pressure_loss: {
       a1: number; a2: number; b1: number; b2: number;
+      aerodynamic_factor: number;
     }
   }
 }
@@ -16,6 +17,7 @@ interface DataContextType {
   data: AppData;
   updatePricing: (section: 'materials' | 'labor' | 'factors', key: string, value: number) => void;
   updateAttenuation: (id: number, value: number) => void; // Simplified update
+  updateConstant: (section: 'pressure_loss', key: string, value: number) => void;
   resetData: () => void;
 }
 
@@ -26,14 +28,21 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     pricing: JSON.parse(JSON.stringify(PRICING_DB)), 
     attenuation: JSON.parse(JSON.stringify(mockRefAtenuacao)),
     constants: {
-      pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0 } 
+      pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0, aerodynamic_factor: 0.5 } 
     }
   });
 
   useEffect(() => {
     const stored = localStorage.getItem('app_data_v1');
     if (stored) {
-      setData(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      // Migration for old data structure if needed
+      if (!parsed.constants?.pressure_loss?.aerodynamic_factor) {
+        if (!parsed.constants) parsed.constants = {};
+        if (!parsed.constants.pressure_loss) parsed.constants.pressure_loss = { a1: 0, a2: 0, b1: 0, b2: 0 };
+        parsed.constants.pressure_loss.aerodynamic_factor = 0.5;
+      }
+      setData(parsed);
     }
   }, []);
 
@@ -58,19 +67,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
      }
   };
 
+  const updateConstant = (section: 'pressure_loss', key: string, value: number) => {
+    const newData = { ...data };
+    // @ts-ignore
+    newData.constants[section][key] = value;
+    saveToStorage(newData);
+  };
+
   const resetData = () => {
     const newData = {
       pricing: JSON.parse(JSON.stringify(PRICING_DB)),
       attenuation: JSON.parse(JSON.stringify(mockRefAtenuacao)),
       constants: {
-        pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0 } 
+        pressure_loss: { a1: 0, a2: 0, b1: 0, b2: 0, aerodynamic_factor: 0.5 } 
       }
     };
     saveToStorage(newData);
   };
 
   return (
-    <DataContext.Provider value={{ data, updatePricing, updateAttenuation, resetData }}>
+    <DataContext.Provider value={{ data, updatePricing, updateAttenuation, updateConstant, resetData }}>
       {children}
     </DataContext.Provider>
   );

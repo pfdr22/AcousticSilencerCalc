@@ -11,7 +11,8 @@ export const calcularPerdaCarga = (
   largura_mm: number,
   altura_mm: number,
   profundidade_mm: number,
-  caudal_m3_h: number
+  caudal_m3_h: number,
+  aerodynamic_factor: number = 0.5 // Default to 0.5 if not provided
 ): PressureLossResult => {
   // Convert dimensions to meters
   const d_k = espessura_mm / 1000; // Baffle thickness (m)
@@ -67,8 +68,8 @@ export const calcularPerdaCarga = (
   const rho = 1.2; // Air density kg/m3
   const delta_p_Pa_raw = 0.5 * rho * Math.pow(velocity, 2) * zeta;
 
-  // Apply aerodynamic profile factor (0.5) as requested
-  const delta_p_Pa = delta_p_Pa_raw * 0.5;
+  // Apply aerodynamic profile factor (configurable)
+  const delta_p_Pa = delta_p_Pa_raw * aerodynamic_factor;
 
   return {
     zeta: Number(zeta.toFixed(2)),

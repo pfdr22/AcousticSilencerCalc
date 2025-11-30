@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Layout from "@/components/Layout";
+import { useData } from "@/contexts/DataContext"; // Import useData
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,7 @@ const getBaffleCountLetter = (n: number): string => {
 };
 
 export default function Calculator() {
+  const { data } = useData(); // Get global data
   const [formState, setFormState] = useState<CalculatorState>({
     largura_mm: 1200,
     altura_mm: 800,
@@ -122,7 +124,8 @@ export default function Calculator() {
       formState.largura_mm,
       formState.altura_mm,
       formState.profundidade_mm,
-      formState.caudal_m3_h
+      formState.caudal_m3_h,
+      data.constants.pressure_loss.aerodynamic_factor // Pass configured factor
     );
 
     const regenNoise = calcularRuidoRegenerado(
