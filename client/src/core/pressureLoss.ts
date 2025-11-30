@@ -46,6 +46,8 @@ export const calcularPerdaCarga = (
 
   // 5. Calculate Zeta (ζ) - VDI 2081 Equation (59)
   // ζ = a1 * [s / (s + dk)]^b1 + a2 * [s / (s + dk)]^b2 * L / dh
+  // Note: Users formula suggestion was likely a transcription error as it omitted Length and used different terms.
+  // We stick to the authoritative VDI 2081 Eq 59 from the provided image.
   const ratio = s / (s + d_k);
   const term1 = a1 * Math.pow(ratio, b1);
   const term2 = a2 * Math.pow(ratio, b2) * (L / d_h);
@@ -62,7 +64,7 @@ export const calcularPerdaCarga = (
   const delta_p_vdi = zeta * 0.5 * rho * Math.pow(velocity, 2);
 
   // 8. Apply Aerodynamic Profile Correction
-  // Multiply by 0.5 as requested for aerodynamic baffles
+  // Multiply by factor (default 0.5) to considering aerodynamic profile
   const delta_p_final = delta_p_vdi * aerodynamic_factor;
 
   return {
