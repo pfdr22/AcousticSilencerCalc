@@ -53,11 +53,16 @@ export function calcular_preco_caixa(
   // Area Chapa 0.8 (Box Walls)
   // Formula: (2*P*(H+35) + 2*P*(L+35)) / 1000000
   const area_walls_m2 = (2 * P * (H + 35) + 2 * P * (L + 35)) / 1000000;
-  const qtd_chapa08 = area_walls_m2 * 1.25; // +25% waste (Standard industry practice)
+  const qtd_chapa08 = area_walls_m2 * 1.30; // +30% waste
 
   // Perfil P30
-  // Formula: 4 * (L + H) / 1000
-  const qtd_perfil = (4 * (L + H)) / 1000;
+  // Formula: 4 * (L + H) / 1000 (2 frames)
+  let qtd_perfil = (4 * (L + H)) / 1000;
+
+  // Reinforcement for large dimensions
+  if (L > 1000 || H > 1000) {
+    qtd_perfil += (2 * (L + H)) / 1000; // Add 1 extra frame
+  }
   
   const qtd_cantos = 8;
   const qtd_rebites = n_baffles * 12; 
@@ -132,7 +137,11 @@ export function calcular_preco_atenuador_baffle(
   const perimeter_mm = 2 * H + 2 * P;
   const frame_width_mm = T + 40; 
   const area_frame_raw = (N * perimeter_mm * frame_width_mm) / 1000000;
-  const qtd_chapa06 = area_frame_raw * 1.25; // +25% waste
+  
+  // Internal Septum for Thicker Baffles (>= 300mm)
+  const area_septum_raw = (T >= 300) ? (H * P * N) / 1000000 : 0;
+
+  const qtd_chapa06 = (area_frame_raw + area_septum_raw) * 1.30; // +30% waste
 
   // Costs
   const c_la = qtd_la * p_la;
