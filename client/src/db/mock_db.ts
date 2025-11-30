@@ -39,11 +39,11 @@ export const mockRefAtenuacao: RefAtenuacao[] = [
   { id: 24, espessura_mm: 300, frequencia_hz: 8000, d_ref_db: 11 },
 ];
 
-// Updated VDI 2081 Constants (Table 17)
+// Updated VDI 2081 Constants (Modified for custom polynomial formula)
 export const mockConstantesVdi: ConstantesVdiPerdaCarga[] = [
-  { id: 1, espessura_mm: 100, a1: 0.235, a2: 0.017, b1: -2.78, b2: -2.70 },
-  { id: 2, espessura_mm: 200, a1: 0.255, a2: 0.015, b1: -2.82, b2: -2.91 },
-  { id: 3, espessura_mm: 300, a1: 0.294, a2: 0.0167, b1: -2.83, b2: -2.95 },
+  { id: 1, espessura_mm: 100, a1: 0.235, a2: 0.017, b1: 0.012, b2: -2.70 }, // Using positive b1 as requested example
+  { id: 2, espessura_mm: 200, a1: 0.255, a2: 0.015, b1: 0.012, b2: -2.91 },
+  { id: 3, espessura_mm: 300, a1: 0.294, a2: 0.0167, b1: 0.012, b2: -2.95 },
 ];
 
 export const mockPrecosCaixa: PrecoUnitarioCaixa[] = [
