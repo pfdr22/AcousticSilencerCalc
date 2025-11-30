@@ -409,7 +409,7 @@ export default function Calculator() {
                    <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div>
                       <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Final Estimado</h3>
-                      <p className="text-sm text-muted-foreground">Cálculo detalhado por componentes (Caixa + Baffles + Laterais)</p>
+                      <p className="text-sm text-muted-foreground">Cálculo detalhado por componentes (Caixa + Baffles)</p>
                     </div>
                     <div className="text-5xl font-bold text-green-700 dark:text-green-400">
                       {finalPriceResult.preco_total.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
@@ -424,7 +424,7 @@ export default function Calculator() {
                       <AccordionContent className="pb-4 pt-2">
                         <div className="grid grid-cols-1 gap-6 text-sm">
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Caixa */}
                             <div className="p-4 bg-slate-50 rounded-md border border-slate-100">
                               <h4 className="font-semibold text-foreground mb-2">1. Caixa (C14)</h4>
@@ -452,26 +452,12 @@ export default function Calculator() {
                                 <span>{finalPriceResult.preco_atenuador_baffle.preco_final.toFixed(2)} €</span>
                               </div>
                             </div>
-
-                            {/* Baffles Laterais */}
-                            <div className="p-4 bg-slate-50 rounded-md border border-slate-100">
-                              <h4 className="font-semibold text-foreground mb-2">3. Baffles Laterais (2x)</h4>
-                              <div className="space-y-1 text-xs text-muted-foreground mb-2">
-                                <div className="flex justify-between"><span>Unitário (C14):</span> <span>{finalPriceResult.preco_baffle_lateral.preco_final.toFixed(2)} €</span></div>
-                                <div className="flex justify-between"><span>Qtd:</span> <span>2</span></div>
-                              </div>
-                              <div className="flex justify-between font-bold text-green-700 pt-2 border-t border-green-200">
-                                <span>Total Laterais:</span>
-                                <span>{(finalPriceResult.preco_baffle_lateral.preco_final * 2).toFixed(2)} €</span>
-                              </div>
-                            </div>
                           </div>
 
                           <div className="p-3 bg-green-50 border border-green-100 rounded-md text-center">
                             <span className="text-green-800 font-medium text-sm">
                               Fórmula: Caixa ({finalPriceResult.preco_caixa.preco_final.toFixed(2)}) + 
-                              Baffles ({finalPriceResult.preco_atenuador_baffle.preco_final.toFixed(2)}) + 
-                              2×Laterais ({(finalPriceResult.preco_baffle_lateral.preco_final * 2).toFixed(2)}) = 
+                              Baffles ({finalPriceResult.preco_atenuador_baffle.preco_final.toFixed(2)}) = 
                               <span className="font-bold ml-1">{finalPriceResult.preco_total.toFixed(2)} €</span>
                             </span>
                           </div>
@@ -509,37 +495,54 @@ export default function Calculator() {
             <Card>
               <CardHeader>
                 <CardTitle>Dados de Entrada</CardTitle>
-                <CardDescription>Dimensões do silenciador e condições de operação.</CardDescription>
+                <CardDescription>Definição geométrica e caudal de ar.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex justify-center bg-muted/30 p-4 rounded-lg border border-border/50">
-                   <img 
-                     src={silencerDimsImage} 
-                     alt="Esquema de dimensões do silenciador" 
-                     className="max-h-48 object-contain mix-blend-multiply dark:mix-blend-normal dark:opacity-90"
-                   />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="width">Largura (mm)</Label>
+                    <Input 
+                      id="width" 
+                      type="number" 
+                      min="100" 
+                      value={formState.largura_mm} 
+                      onChange={(e) => handleInputChange('largura_mm', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="height">Altura (mm)</Label>
+                    <Input 
+                      id="height" 
+                      type="number" 
+                      min="100" 
+                      value={formState.altura_mm} 
+                      onChange={(e) => handleInputChange('altura_mm', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="depth">Profundidade (mm)</Label>
+                    <Input 
+                      id="depth" 
+                      type="number" 
+                      min="100" 
+                      value={formState.profundidade_mm} 
+                      onChange={(e) => handleInputChange('profundidade_mm', Number(e.target.value))}
+                    />
+                  </div>
                 </div>
+
+                <Separator />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="largura">Largura (mm) <span className="text-destructive">*</span></Label>
-                    <Input id="largura" type="number" value={formState.largura_mm} onChange={(e) => handleInputChange('largura_mm', Number(e.target.value))} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="altura">Altura (mm) <span className="text-destructive">*</span></Label>
-                    <Input id="altura" type="number" value={formState.altura_mm} onChange={(e) => handleInputChange('altura_mm', Number(e.target.value))} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="profundidade">Profundidade (mm) <span className="text-destructive">*</span></Label>
-                    <Input id="profundidade" type="number" value={formState.profundidade_mm} onChange={(e) => handleInputChange('profundidade_mm', Number(e.target.value))} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="caudal">Caudal (m³/h) <span className="text-destructive">*</span></Label>
-                    <Input id="caudal" type="number" value={formState.caudal_m3_h} onChange={(e) => handleInputChange('caudal_m3_h', Number(e.target.value))} className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="espessura">Espessura Baffles (mm) <span className="text-destructive">*</span></Label>
-                    <Select value={formState.espessura_baffles_mm.toString()} onValueChange={(val) => handleInputChange('espessura_baffles_mm', Number(val))}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <Label>Espessura das Células</Label>
+                    <Select 
+                      value={formState.espessura_baffles_mm.toString()} 
+                      onValueChange={(v) => handleInputChange('espessura_baffles_mm', Number(v))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a espessura" />
+                      </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="100">100 mm</SelectItem>
                         <SelectItem value="200">200 mm</SelectItem>
@@ -548,101 +551,127 @@ export default function Calculator() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="n_baffles">Nº de Baffles <span className="text-destructive">*</span></Label>
-                    <Input id="n_baffles" type="number" min={1} value={formState.numero_baffles} onChange={(e) => handleInputChange('numero_baffles', Number(e.target.value))} />
+                    <Label htmlFor="baffles">Número de Células</Label>
+                    <Input 
+                      id="baffles" 
+                      type="number" 
+                      min="1" 
+                      max="50" 
+                      value={formState.numero_baffles} 
+                      onChange={(e) => handleInputChange('numero_baffles', Number(e.target.value))}
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <CardTitle>Ruído a Montante</CardTitle>
-                    <CardDescription>Espectro sonoro na entrada (opcional).</CardDescription>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Tabs value={formState.noiseMode} onValueChange={handleModeChange} className="h-8">
-                      <TabsList className="h-8">
-                        <TabsTrigger value="LW" className="text-xs px-3 h-6">LW (Linear)</TabsTrigger>
-                        <TabsTrigger value="LWA" className="text-xs px-3 h-6">LWA (Ponderado A)</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                    <div className="text-right min-w-[100px]">
-                      <span className="text-xs font-medium uppercase text-muted-foreground block">Nível Global</span>
-                      <span className="text-2xl font-bold font-mono text-primary">
-                        {calculations.globalNoise} <span className="text-sm font-sans text-muted-foreground">dB{formState.noiseMode === 'LWA' ? '(A)' : ''}</span>
-                      </span>
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="flow" className="text-base">Caudal de Ar (m³/h)</Label>
+                  <div className="flex gap-4 items-center">
+                    <Input 
+                      id="flow" 
+                      type="number" 
+                      min="0" 
+                      className="text-lg font-mono"
+                      value={formState.caudal_m3_h} 
+                      onChange={(e) => handleInputChange('caudal_m3_h', Number(e.target.value))}
+                    />
+                    <div className="text-sm text-muted-foreground whitespace-nowrap">
+                      Velocidade: <span className={calculations.isValidVelocity ? "text-green-600 font-bold" : "text-red-600 font-bold"}>{calculations.velocidade_ms} m/s</span>
                     </div>
                   </div>
+                  {!calculations.isValidVelocity && (
+                    <p className="text-xs text-red-500 font-medium mt-1">Atenção: Velocidade excessiva ({'>'} 20 m/s)</p>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-                  {FREQUENCIES.map((freq) => (
-                    <div key={freq} className="space-y-1">
-                      <Label htmlFor={`f-${freq}`} className="text-xs text-muted-foreground text-center block">{freq}</Label>
-                      <Input 
-                        id={`f-${freq}`} placeholder="dB" value={formState.ruido_montante[freq] || ''} 
-                        className="h-8 text-sm text-center px-1" onChange={(e) => handleNoiseChange(freq, e.target.value)} 
-                      />
-                    </div>
-                  ))}
-                </div>
+
+                <Button 
+                  className="w-full h-12 text-lg gap-2 mt-4" 
+                  onClick={handleCalculate}
+                  disabled={calculations.hasError}
+                >
+                  <CalcIcon className="w-5 h-5" />
+                  Calcular Resultados
+                </Button>
               </CardContent>
             </Card>
+            
+            {/* Initial Guidance / Empty State */}
+            <div className="bg-muted/30 rounded-lg p-6 border border-dashed flex flex-col items-center justify-center text-center h-[200px]">
+              <div className="p-3 bg-background rounded-full mb-4">
+                <BarChart3 className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <h3 className="font-medium text-foreground">Resultados detalhados</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mt-1">
+                Preencha os dados geométricos e clique em "Calcular" para ver a atenuação, perda de carga e preço.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6">
-            <Card className="border-l-4 border-l-primary shadow-lg">
-              <CardHeader>
-                <CardTitle>Resultados</CardTitle>
-                <CardDescription>Cálculo em tempo real</CardDescription>
+             {/* RUÍDO DE ENTRADA */}
+             <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Ruído a Montante (L_up)</CardTitle>
+                  <div className="flex items-center gap-1 bg-muted p-1 rounded-md">
+                    <button 
+                      onClick={() => handleModeChange('LW')}
+                      className={`text-xs px-2 py-1 rounded-sm transition-colors ${formState.noiseMode === 'LW' ? 'bg-white shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Lw
+                    </button>
+                    <button 
+                      onClick={() => handleModeChange('LWA')}
+                      className={`text-xs px-2 py-1 rounded-sm transition-colors ${formState.noiseMode === 'LWA' ? 'bg-white shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Lw(A)
+                    </button>
+                  </div>
+                </div>
+                <CardDescription>Espectro sonoro na entrada do silenciador.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-1.5 p-4 bg-muted rounded-md border border-border">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase">Modelo SRC</Label>
-                  <div className="font-mono text-lg font-bold tracking-tight break-all text-primary">
-                    {calculations.modelName}
-                  </div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Velocidade (m/s)</Label>
-                    <div className={`text-2xl font-bold ${calculations.isValidVelocity ? 'text-foreground' : 'text-destructive'}`}>
-                      {calculations.velocidade_ms}
+              <CardContent>
+                <div className="space-y-3">
+                  {FREQUENCIES.map((hz) => (
+                    <div key={hz} className="grid grid-cols-4 items-center gap-2">
+                      <Label htmlFor={`noise-${hz}`} className="text-xs text-muted-foreground text-right col-span-1">{hz} Hz</Label>
+                      <Input 
+                        id={`noise-${hz}`}
+                        type="number" 
+                        className="h-8 text-right font-mono col-span-2"
+                        placeholder="0"
+                        value={formState.ruido_montante[hz] || ''}
+                        onChange={(e) => handleNoiseChange(hz, e.target.value)}
+                      />
+                      <span className="text-xs text-muted-foreground col-span-1">dB</span>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Área Livre (m²)</Label>
-                    <div className="text-2xl font-bold text-foreground">{calculations.area_livre_m2}</div>
+                  ))}
+                  <Separator className="my-2" />
+                  <div className="flex justify-between items-center px-2">
+                    <span className="font-semibold text-sm">Total Global</span>
+                    <span className="font-mono font-bold text-primary">{calculations.globalNoise} dB</span>
                   </div>
                 </div>
-                <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Gap Calculado (mm)</Label>
-                    <div className="text-lg font-medium text-foreground">{calculations.gap_mm}</div>
-                </div>
-                {!calculations.isValidVelocity && (
-                  <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Velocidade Excessiva</AlertTitle>
-                    <AlertDescription>A velocidade ultrapassa o limite de 20 m/s. Por favor ajuste as dimensões ou baffles.</AlertDescription>
-                  </Alert>
-                )}
-                {Number(calculations.area_livre_m2) <= 0 && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Erro Geométrico</AlertTitle>
-                    <AlertDescription>A área livre é inválida. Verifique o número e espessura dos baffles em relação à largura.</AlertDescription>
-                  </Alert>
-                )}
-                <Button className="w-full mt-4" size="lg" disabled={calculations.hasError} onClick={handleCalculate}>
-                  Seguinte
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
               </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden">
+               <div className="aspect-square w-full bg-white p-6 flex items-center justify-center">
+                  <img 
+                    src={silencerDimsImage} 
+                    alt="Esquema Silenciador" 
+                    className="max-w-full max-h-full object-contain opacity-90"
+                  />
+               </div>
+               <div className="bg-muted/50 p-4 text-xs text-muted-foreground border-t">
+                 <div className="grid grid-cols-2 gap-2">
+                   <div><span className="font-bold">L:</span> Largura</div>
+                   <div><span className="font-bold">H:</span> Altura</div>
+                   <div><span className="font-bold">P:</span> Profundidade</div>
+                   <div><span className="font-bold">S:</span> Espessura Baffle</div>
+                 </div>
+               </div>
             </Card>
           </div>
         </div>

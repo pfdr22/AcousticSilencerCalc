@@ -13,13 +13,12 @@ export interface PriceComponentResult {
   custos_indiretos_valor: number;
   lucro_valor: number;
   preco_final: number;
-  detalhes: Record<string, number>; // Stores quantities or specific costs for debugging/display
+  detalhes: Record<string, number>;
 }
 
 export interface FinalPriceResult {
   preco_atenuador_baffle: PriceComponentResult;
   preco_caixa: PriceComponentResult;
-  preco_baffle_lateral: PriceComponentResult;
   preco_total: number;
 }
 
@@ -36,9 +35,9 @@ export function calcular_preco_caixa(
   n_baffles: number,
   precos: PrecoUnitarioCaixa[]
 ): PriceComponentResult {
-  const W = dim.width_mm;
+  const L = dim.width_mm;
   const H = dim.height_mm;
-  const L = dim.depth_mm;
+  const P = dim.depth_mm;
 
   // Prices
   const p_chapa08 = getVal(precos, "Chapa 0.8mm (m2)");
@@ -51,14 +50,17 @@ export function calcular_preco_caixa(
   const pct_lucro = getVal(precos, "Lucro (%)") / 100;
 
   // Quantities
-  // Area Chapa 0.8 (Box Walls) - Formula approximation based on perimeter * length + flanges
-  // (2*L*(H+35) + 2*L*(W+35)) / 1e6 * 1.2 (waste)
-  const area_walls_m2 = (2 * L * (H + 35) + 2 * L * (W + 35)) / 1000000;
-  const qtd_chapa08 = area_walls_m2 * 1.2;
+  // Area Chapa 0.8 (Box Walls)
+  // Formula: (2*P*(H+35) + 2*P*(L+35)) / 1000000
+  const area_walls_m2 = (2 * P * (H + 35) + 2 * P * (L + 35)) / 1000000;
+  const qtd_chapa08 = area_walls_m2 * 1.2; // +20% waste
 
-  const qtd_perfil = (4 * (W + H)) / 1000;
+  // Perfil P30
+  // Formula: 4 * (L + H) / 1000
+  const qtd_perfil = (4 * (L + H)) / 1000;
+  
   const qtd_cantos = 8;
-  const qtd_rebites = n_baffles * 12; // Estimation
+  const qtd_rebites = n_baffles * 12; 
   const qtd_palete = 1;
 
   // Direct Costs
@@ -69,7 +71,7 @@ export function calcular_preco_caixa(
   const c_palete = qtd_palete * p_palete;
   
   const custo_materiais = c_chapa + c_perfil + c_cantos + c_rebites + c_palete;
-  const custo_mao_de_obra = area_walls_m2 * p_mao_obra; // Labor based on surface area
+  const custo_mao_de_obra = area_walls_m2 * p_mao_obra;
   
   const subtotal = custo_materiais + custo_mao_de_obra;
   const custos_indiretos_valor = subtotal * pct_indiretos;
@@ -95,7 +97,7 @@ export function calcular_preco_caixa(
 }
 
 /**
- * Cálculo Atenuador BAFFLE (C15) - Central Baffles
+ * Cálculo Atenuador BAFFLE (C15)
  */
 export function calcular_preco_atenuador_baffle(
   dim: BoxDimensions,
@@ -108,92 +110,36 @@ export function calcular_preco_atenuador_baffle(
   }
 
   const H = dim.height_mm;
-  const L = dim.depth_mm;
+  const P = dim.depth_mm;
+  const N = n_baffles;
+  const T = espessura_mm;
 
   // Prices
   const p_chapa06 = getVal(precos, "Chapa 0.6mm (m2)");
   const p_la = getVal(precos, "Lã Knauf (m2)");
-  // const p_la_sem_pelicula = getVal(precos, "Lã Knauf s/ pelicula (m2)"); // Not used in standard baffle?
   const p_mao_obra = getVal(precos, "Mão de obra baffles (€/m2)");
   const pct_indiretos = getVal(precos, "Custos indiretos (%)") / 100;
   const pct_lucro = getVal(precos, "Lucro (%)") / 100;
 
   // Quantities
-  // Wool: 2 faces per baffle
-  const area_la_raw = (2 * H * L * n_baffles) / 1000000;
+  // Wool: 2 * H * P * N / 1000000
+  const area_la_raw = (2 * H * P * N) / 1000000;
   const qtd_la = area_la_raw * 1.05; // 5% waste
 
-  // Frame (Chapa 0.6): Perimeter of baffle * thickness frame
-  const perimeter_mm = 2 * (H + L);
-  const frame_width_mm = espessura_mm + 40; 
-  const area_frame_raw = (n_baffles * perimeter_mm * frame_width_mm) / 1000000;
-  const qtd_chapa06 = area_frame_raw * 1.2;
+  // Frame (Chapa 0.6)
+  // Formula: N * (2*H + 2*P) * (T + 40) / 1000000
+  // Perimeter = 2H + 2P
+  const perimeter_mm = 2 * H + 2 * P;
+  const frame_width_mm = T + 40; 
+  const area_frame_raw = (N * perimeter_mm * frame_width_mm) / 1000000;
+  const qtd_chapa06 = area_frame_raw * 1.2; // +20% waste
 
   // Costs
   const c_la = qtd_la * p_la;
   const c_chapa = qtd_chapa06 * p_chapa06;
 
   const custo_materiais = c_la + c_chapa;
-  const custo_mao_de_obra = area_la_raw * p_mao_obra; // Based on wool area?
-
-  const subtotal = custo_materiais + custo_mao_de_obra;
-  const custos_indiretos_valor = subtotal * pct_indiretos;
-  const base_lucro = subtotal + custos_indiretos_valor;
-  const lucro_valor = base_lucro * pct_lucro;
-  const preco_final = base_lucro + lucro_valor;
-
-  return {
-    custo_materiais,
-    custo_mao_de_obra,
-    subtotal,
-    custos_indiretos_valor,
-    lucro_valor,
-    preco_final,
-    detalhes: {
-      qtd_la,
-      qtd_chapa06
-    }
-  };
-}
-
-/**
- * Cálculo "Baffle" BAFFLE (C14) - Lateral Baffles (Side Linings)
- * Usually half thickness or specific treatment on the box walls.
- * Assuming this calculation is for ONE side baffle.
- */
-export function calcular_preco_baffle_lateral(
-  dim: BoxDimensions,
-  espessura_mm: number, // Typically half of central baffle or same? Let's use passed thickness
-  precos: PrecoUnitarioBaffle[]
-): PriceComponentResult {
-  const H = dim.height_mm;
-  const L = dim.depth_mm;
-
-  // Prices
-  const p_chapa06 = getVal(precos, "Chapa 0.6mm (m2)");
-  // Side baffles often use wool without film or different mounting?
-  // Prompt says "Lã Knauf s/ pelicula" exists. Let's use it if appropriate, or standard.
-  // Let's assume standard for now unless specified.
-  const p_la = getVal(precos, "Lã Knauf (m2)"); 
-  const p_mao_obra = getVal(precos, "Mão de obra baffles lateral (€/m2)");
-  const pct_indiretos = getVal(precos, "Custos indiretos (%)") / 100;
-  const pct_lucro = getVal(precos, "Lucro (%)") / 100;
-
-  // Quantities for ONE side baffle
-  // Usually covers 1 wall (H * L)
-  const area_surface = (H * L) / 1000000;
-  const qtd_la = area_surface * 1.05; // 1 layer?
-
-  // Frame/Perforated sheet for side baffle
-  // Usually a perforated sheet covering the wool.
-  const qtd_chapa06 = area_surface * 1.2; // Perforated sheet area
-
-  // Costs
-  const c_la = qtd_la * p_la;
-  const c_chapa = qtd_chapa06 * p_chapa06;
-
-  const custo_materiais = c_la + c_chapa;
-  const custo_mao_de_obra = area_surface * p_mao_obra;
+  const custo_mao_de_obra = area_la_raw * p_mao_obra; // Labor based on wool area
 
   const subtotal = custo_materiais + custo_mao_de_obra;
   const custos_indiretos_valor = subtotal * pct_indiretos;
@@ -228,17 +174,13 @@ export function calcular_preco_total(
   
   const preco_caixa = calcular_preco_caixa(dim, n_baffles, precos_caixa);
   const preco_atenuador_baffle = calcular_preco_atenuador_baffle(dim, n_baffles, espessura_mm, precos_baffle);
-  const preco_baffle_lateral = calcular_preco_baffle_lateral(dim, espessura_mm, precos_baffle);
 
-  // Final Formula: Atenuador + Caixa + 2 * Lateral
-  const preco_total = preco_atenuador_baffle.preco_final + 
-                      preco_caixa.preco_final + 
-                      (2 * preco_baffle_lateral.preco_final);
+  // Final Formula: Atenuador + Caixa (No lateral baffles)
+  const preco_total = preco_atenuador_baffle.preco_final + preco_caixa.preco_final;
 
   return {
     preco_atenuador_baffle,
     preco_caixa,
-    preco_baffle_lateral,
     preco_total: Number(preco_total.toFixed(2))
   };
 }
