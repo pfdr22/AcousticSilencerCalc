@@ -47,13 +47,24 @@ export const mockConstantesVdi: ConstantesVdiPerdaCarga[] = [
 ];
 
 export const mockPrecosCaixa: PrecoUnitarioCaixa[] = [
-  { id: 1, descricao: "Chapa Galvanizada 0.8mm", tipo: "material", valor: 15.50 },
-  { id: 2, descricao: "Mão de Obra Montagem", tipo: "servico", valor: 45.00 },
+  { id: 1, descricao: "Chapa 0.8mm (m2)", tipo: "material", valor: 7.50 },
+  { id: 2, descricao: "Perfil P30 (m.l)", tipo: "material", valor: 1.30 },
+  { id: 3, descricao: "Cantos metálicos (un)", tipo: "material", valor: 0.15 },
+  { id: 4, descricao: "Rebites (un)", tipo: "material", valor: 0.02 },
+  { id: 5, descricao: "Palete + Embalagem (un)", tipo: "material", valor: 4.50 },
+  { id: 6, descricao: "Mão de obra caixa (€/m2)", tipo: "servico", valor: 4.50 },
+  { id: 7, descricao: "Custos indiretos (%)", tipo: "fator", valor: 35 },
+  { id: 8, descricao: "Lucro (%)", tipo: "fator", valor: 15 },
 ];
 
 export const mockPrecosBaffle: PrecoUnitarioBaffle[] = [
-  { id: 1, descricao: "Lã Mineral 50mm", tipo: "isolamento", valor: 8.20 },
-  { id: 2, descricao: "Perfil Perfurado", tipo: "estrutura", valor: 12.40 },
+  { id: 1, descricao: "Chapa 0.6mm (m2)", tipo: "material", valor: 5.50 },
+  { id: 2, descricao: "Lã Knauf (m2)", tipo: "material", valor: 6.50 },
+  { id: 3, descricao: "Lã Knauf s/ pelicula (m2)", tipo: "material", valor: 4.00 },
+  { id: 4, descricao: "Mão de obra baffles (€/m2)", tipo: "servico", valor: 5.00 },
+  { id: 5, descricao: "Mão de obra baffles lateral (€/m2)", tipo: "servico", valor: 5.00 },
+  { id: 6, descricao: "Custos indiretos (%)", tipo: "fator", valor: 35 },
+  { id: 7, descricao: "Lucro (%)", tipo: "fator", valor: 15 },
 ];
 
 export const mockUsers: User[] = [

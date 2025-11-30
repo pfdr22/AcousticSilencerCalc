@@ -1,0 +1,93 @@
+Esta é uma tarefa de ATUALIZAÇÃO.
+Não alteres nada na UI de formulários nem noutras partes da aplicação, exceto o que segue.
+
+Objetivo:
+
+Atualizar a lógica de cálculo de preço para replicar exatamente as folhas Excel:
+
+‘Cálculo Atenuador BAFFLE’ (C15)
+
+‘Cálculo CAIXA’ (C14)
+
+‘Cálculo "Baffle" BAFFLE’ (C14)
+Preço Final (€) = Cálculo Atenuador BAFFLE C15 + Cálculo CAIXA C14 + 2 × Cálculo "Baffle" BAFFLE C14.
+
+No painel de administrador, permitir editar os dados hoje equivalentes às folhas:
+
+‘Preços Unitários Caixa’
+
+‘Preços Unitários Baffle’.
+
+Requisitos técnicos:
+
+Cálculo de preço
+
+Mantém o formulário atual.
+
+No backend, cria funções puras, sem efeitos colaterais, por exemplo:
+
+calcular_preco_atenuador_baffle(dim, precos_caixa)
+
+calcular_preco_caixa(dim, precos_caixa)
+
+calcular_preco_baffle_lateral(dim_baffle, precos_caixa, precos_baffle)
+
+calcular_preco_total(...) que combina as três e é a única chamada pela UI.
+
+Implementa as três funções com a mesma estrutura das folhas:
+
+Quantidades de materiais (áreas de chapa 0,8 / 0,6, lã com/sem película, comprimentos de perfil, nº de cantos, rebites, palete, etc.).
+
+Custos = quantidade × preço unitário.
+
+Subtotal = soma dos custos diretos.
+
+Custos indiretos = Subtotal × ‘Custos indiretos (%)’.
+
+Lucro = (Subtotal + Custos indiretos) × ‘Lucro (%)’.
+
+Preço final de cada bloco = Subtotal + Custos indiretos + Lucro.
+
+Garante que os nomes dos campos de preço unitário coincidem com os registos de BD a criar no passo 2 (ex.: ‘Chapa 0.8mm (m2)’, ‘Lã Knauf (m2)’, ‘Palete + Embalagem (un)’, ‘Mão de obra caixa (€/m2)’, etc.).
+
+No final, a função que devolve o preço para o frontend tem de usar:
+preco_total = preco_atenuador_baffle + preco_caixa + 2 * preco_baffle_lateral.
+
+Painel de administrador – preços unitários
+
+No esquema de BD, cria (ou reutiliza) duas tabelas:
+
+precos_unitarios_caixa(id, descricao, valor, tipo)
+
+precos_unitarios_baffle(id, descricao, valor, tipo)
+
+Preenche com os valores atuais (por código de seed) de:
+
+Chapa 0.8mm (m2), Chapa 0.6mm (m2), Lã Knauf (m2), Lã Knauf s/ pelicula (m2), Perfil P30 (m.l), Cantos metálicos (un), Rebites (un), Palete + Embalagem (un), Mão de obra caixa (€/m2), Mão de obra baffles (€/m2), Mão de obra baffles lateral (€/m2), Custos indiretos (%), Lucro (%).
+
+No painel admin, adiciona duas páginas:
+
+‘Preços Unitários Caixa’
+
+‘Preços Unitários Baffle’
+Cada página deve:
+
+listar os registos em tabela (descrição + input para valor);
+
+permitir editar e guardar;
+
+atualizar imediatamente os valores usados nas funções de cálculo (sem precisar recompilar).
+
+Mantém o controlo de acesso: só utilizadores admin podem ver/editar estes preços.
+
+Quando terminares, mostra:
+
+As novas funções de cálculo de preço;
+
+As alterações às rotas/serviços que as chamam;
+
+Os modelos/tabelas usados para ‘Preços Unitários Caixa’ e ‘Preços Unitários Baffle’;
+
+Os novos ecrãs do painel de administração.
+
+Não implementes mais funcionalidades além destas

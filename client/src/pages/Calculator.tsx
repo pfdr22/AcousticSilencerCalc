@@ -15,7 +15,7 @@ import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
 import { calcularRuidoRegenerado, RegeneratedNoiseResult } from "@/core/regeneratedNoise";
 import { calcularRuidoJusante, DownstreamNoiseResult } from "@/core/downstreamNoise";
-import { calcular_preco_final, FinalPriceResult } from "@/core/pricing";
+import { calcular_preco_total, FinalPriceResult } from "@/core/pricing";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -143,14 +143,16 @@ export default function Calculator() {
       formState.noiseMode
     );
 
-    const priceResult = calcular_preco_final(
+    const priceResult = calcular_preco_total(
       {
         width_mm: formState.largura_mm,
         height_mm: formState.altura_mm,
         depth_mm: formState.profundidade_mm
       },
       formState.numero_baffles,
-      formState.espessura_baffles_mm
+      formState.espessura_baffles_mm,
+      data.pricing_caixa,
+      data.pricing_baffle
     );
 
     setAttenuationResult(attResult);
@@ -407,47 +409,73 @@ export default function Calculator() {
                    <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div>
                       <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Final Estimado</h3>
-                      <p className="text-sm text-muted-foreground">Inclui materiais, mão de obra e custos indiretos.</p>
+                      <p className="text-sm text-muted-foreground">Cálculo detalhado por componentes (Caixa + Baffles + Laterais)</p>
                     </div>
                     <div className="text-5xl font-bold text-green-700 dark:text-green-400">
-                      {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
+                      {finalPriceResult.preco_total.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
                     </div>
                   </div>
 
                   <Accordion type="single" collapsible className="w-full mt-4">
                     <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
                       <AccordionTrigger className="hover:no-underline py-3">
-                        <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
+                        <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos (Estrutura Excel)</span>
                       </AccordionTrigger>
                       <AccordionContent className="pb-4 pt-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
-                              <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                        <div className="grid grid-cols-1 gap-6 text-sm">
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Caixa */}
+                            <div className="p-4 bg-slate-50 rounded-md border border-slate-100">
+                              <h4 className="font-semibold text-foreground mb-2">1. Caixa (C14)</h4>
+                              <div className="space-y-1 text-xs text-muted-foreground mb-2">
+                                <div className="flex justify-between"><span>Materiais:</span> <span>{finalPriceResult.preco_caixa.custo_materiais.toFixed(2)} €</span></div>
+                                <div className="flex justify-between"><span>Mão de Obra:</span> <span>{finalPriceResult.preco_caixa.custo_mao_de_obra.toFixed(2)} €</span></div>
+                                <div className="flex justify-between border-t pt-1 mt-1"><span>Subtotal:</span> <span>{finalPriceResult.preco_caixa.subtotal.toFixed(2)} €</span></div>
+                              </div>
+                              <div className="flex justify-between font-bold text-green-700 pt-2 border-t border-green-200">
+                                <span>Preço Caixa:</span>
+                                <span>{finalPriceResult.preco_caixa.preco_final.toFixed(2)} €</span>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
-                              <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
+
+                            {/* Atenuador Baffles */}
+                            <div className="p-4 bg-slate-50 rounded-md border border-slate-100">
+                              <h4 className="font-semibold text-foreground mb-2">2. Atenuador Baffles (C15)</h4>
+                              <div className="space-y-1 text-xs text-muted-foreground mb-2">
+                                <div className="flex justify-between"><span>Materiais:</span> <span>{finalPriceResult.preco_atenuador_baffle.custo_materiais.toFixed(2)} €</span></div>
+                                <div className="flex justify-between"><span>Mão de Obra:</span> <span>{finalPriceResult.preco_atenuador_baffle.custo_mao_de_obra.toFixed(2)} €</span></div>
+                                <div className="flex justify-between border-t pt-1 mt-1"><span>Subtotal:</span> <span>{finalPriceResult.preco_atenuador_baffle.subtotal.toFixed(2)} €</span></div>
+                              </div>
+                              <div className="flex justify-between font-bold text-green-700 pt-2 border-t border-green-200">
+                                <span>Preço Baffles:</span>
+                                <span>{finalPriceResult.preco_atenuador_baffle.preco_final.toFixed(2)} €</span>
+                              </div>
                             </div>
-                            <div className="flex justify-between font-medium pt-1 border-t">
-                              <span>Subtotal Direto:</span>
-                              <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+
+                            {/* Baffles Laterais */}
+                            <div className="p-4 bg-slate-50 rounded-md border border-slate-100">
+                              <h4 className="font-semibold text-foreground mb-2">3. Baffles Laterais (2x)</h4>
+                              <div className="space-y-1 text-xs text-muted-foreground mb-2">
+                                <div className="flex justify-between"><span>Unitário (C14):</span> <span>{finalPriceResult.preco_baffle_lateral.preco_final.toFixed(2)} €</span></div>
+                                <div className="flex justify-between"><span>Qtd:</span> <span>2</span></div>
+                              </div>
+                              <div className="flex justify-between font-bold text-green-700 pt-2 border-t border-green-200">
+                                <span>Total Laterais:</span>
+                                <span>{(finalPriceResult.preco_baffle_lateral.preco_final * 2).toFixed(2)} €</span>
+                              </div>
                             </div>
+                          </div>
+
+                          <div className="p-3 bg-green-50 border border-green-100 rounded-md text-center">
+                            <span className="text-green-800 font-medium text-sm">
+                              Fórmula: Caixa ({finalPriceResult.preco_caixa.preco_final.toFixed(2)}) + 
+                              Baffles ({finalPriceResult.preco_atenuador_baffle.preco_final.toFixed(2)}) + 
+                              2×Laterais ({(finalPriceResult.preco_baffle_lateral.preco_final * 2).toFixed(2)}) = 
+                              <span className="font-bold ml-1">{finalPriceResult.preco_total.toFixed(2)} €</span>
+                            </span>
                           </div>
                           
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Custos Indiretos:</span>
-                              <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Margem de Lucro:</span>
-                              <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
-                            </div>
-                          </div>
                         </div>
                       </AccordionContent>
                     </AccordionItem>
