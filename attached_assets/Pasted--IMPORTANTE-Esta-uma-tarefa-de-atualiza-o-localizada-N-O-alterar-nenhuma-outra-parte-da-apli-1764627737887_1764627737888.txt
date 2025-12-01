@@ -1,0 +1,218 @@
+“IMPORTANTE﻿ – Esta é uma tarefa de atualização localizada.
+NÃO alterar nenhuma outra parte da aplicação (UI, cálculos acústicos, lógica de ruído, etc.).
+Só podes mexer na LÓGICA DO CÁLCULO DE PREÇO e nos DADOS DE PREÇOS UNITÁRIOS no painel de administrador.
+
+Eliminar completamente a lógica de preço antiga
+
+Remove todo o código existente relacionado com o cálculo de preço do silenciador (funções, helpers, variáveis, restos de modelos) que não seja apenas UI.
+
+Mantém o formulário inicial tal como está: a app já recolhe do utilizador estes campos:
+
+largura_mm
+
+altura_mm
+
+profundidade_mm
+
+n_baffles_internos
+
+espessura_baffles_mm
+
+No código de cálculo, considera o seguinte mapeamento, equivalente às células do Excel que envio:
+
+B2 = largura_mm
+
+B4 = altura_mm
+
+B6 = profundidade_mm
+
+B9 = n_baffles_internos
+
+B11 = espessura_baffles_mm
+
+Nova lógica de cálculo de preço
+
+Implementa no backend uma função pura, por exemplo calcular_preco_total(dados_dim, precos_unitarios_caixa), que devolve o preco_final_eur e segue EXACTAMENTE a lógica abaixo.
+Não uses fórmulas antigas, só estas.
+
+2.1. Cálculo Atenuador BAFFLE
+
+Usa as fórmulas equivalentes às células B22–B30 e C22–C33, com as variáveis (em mm) B2,B4,B6,B9,B11 e os preços unitários (abaixo):
+
+Quantidades:
+
+area_chapa_08_baffle_m2
+= ((2B6(B4+35) + 2B6(B2+35))/1_000_000) * 1.2
+
+area_chapa_06_baffle_m2
+= ((2B4(B11+90) + 2B6(B11+50))/1_000_000 * B9)
+
+(2B6100/1_000_000) * (B9 se B4>1250 senão 0)
+
+area_la_baffle_m2
+= B4*B6/1_000_000 * 2 * B9
+
+area_la_sem_pel_baffle_m2
+= B4*B6/1_000_000 * B9 * ((B11-100)/50)
+
+comprimento_P30_baffle_ml
+= 4*(B2+B4)/1000
+
+qtd_cantos_baffle = 8
+
+qtd_rebites_baffle = B9 * 12
+
+qtd_palete_baffle = 0
+
+mao_obra_caixa_baffle_m2 = preco_mo_caixa * area_chapa_08_baffle_m2
+
+mao_obra_baffles_baffle = preco_mo_baffles * B9
+
+Custos diretos (usa Preços Unitários Caixa):
+
+custo_chapa_08_baffle = area_chapa_08_baffle_m2 * PU['Chapa 0.8mm (m2)']
+
+custo_chapa_06_baffle = area_chapa_06_baffle_m2 * PU['Chapa 0.6mm (m2)']
+
+custo_la_baffle = area_la_baffle_m2 * PU['Lã Knauf (m2)']
+
+custo_la_sem_pel_baffle = area_la_sem_pel_baffle_m2 * PU['Lã Knauf s/ pelicula (m2)']
+
+custo_P30_baffle = 0
+
+custo_cantos_baffle = 0
+
+custo_rebites_baffle = qtd_rebites_baffle * PU['Rebites (un)']
+
+custo_palete_baffle = 0
+
+custo_mo_caixa_baffle = mao_obra_caixa_baffle_m2 (já é custo)
+
+custo_mo_baffles_baffle = mao_obra_baffles_baffle (já é custo)
+
+Subtotal_ATEN_BAFFLE = soma de todos os custos acima.
+Custos_indiretos_ATEN_BAFFLE = Subtotal_ATEN_BAFFLE * PU['Custos indiretos (%)'].
+Lucro_ATEN_BAFFLE = (Subtotal_ATEN_BAFFLE + Custos_indiretos_ATEN_BAFFLE) * PU['Lucro (%)'].
+Preco_ATEN_BAFFLE = Subtotal_ATEN_BAFFLE + Custos_indiretos_ATEN_BAFFLE + Lucro_ATEN_BAFFLE.
+
+2.2. Cálculo CAIXA
+
+Mesma lógica das células B39–B47 e C39–C50:
+
+Quantidades:
+
+area_chapa_08_caixa_m2
+= ((2B6(B4+35) + 2B6(B2+35))/1_000_000)
+
+area_chapa_06_caixa_m2
+= ((2B4(B11+95) + 2B6(B11+50))/1_000_000 * B9)
+
+(2 * B4 * 295 / 1_000_000) * (B9 se B6>1000 senão 0)
+
+(2 * B6 * 250 / 1_000_000) * (B9 se B4>1000 senão 0)
+
+area_la_caixa_m2
+= (B6B4/1_000_000 * B9(B11/50))
+
+comprimento_P30_caixa_ml
+= 4*(B2+B4)/1000
+
+qtd_cantos_caixa = 8
+
+qtd_rebites_caixa = B9 * 12
+
+qtd_palete_caixa = 1
+
+mao_obra_caixa_caixa = preco_mo_caixa (já custo)
+
+mao_obra_baffles_caixa = preco_mo_baffles * area_chapa_06_caixa_m2
+
+Custos diretos:
+
+custo_chapa_08_caixa = area_chapa_08_caixa_m2 * PU['Chapa 0.8mm (m2)']
+
+custo_chapa_06_caixa = area_chapa_06_caixa_m2 * PU['Chapa 0.6mm (m2)']
+
+custo_la_caixa = area_la_caixa_m2 * PU['Lã Knauf (m2)']
+
+custo_P30_caixa = comprimento_P30_caixa_ml * PU['Perfil P30 (m.l)']
+
+custo_cantos_caixa = qtd_cantos_caixa * PU['Cantos metálicos (un)']
+
+custo_rebites_caixa = qtd_rebites_caixa * PU['Rebites (un)']
+
+custo_palete_caixa = qtd_palete_caixa * PU['Palete + Embalagem (un)']
+
+custo_mo_caixa_caixa = mao_obra_caixa_caixa
+
+custo_mo_baffles_caixa = mao_obra_baffles_caixa
+
+Subtotal_CAIXA = soma custos diretos.
+Custos_indiretos_CAIXA = Subtotal_CAIXA * PU['Custos indiretos (%)'].
+Lucro_CAIXA = (Subtotal_CAIXA + Custos_indiretos_CAIXA) * PU['Lucro (%)'].
+Preco_CAIXA = Subtotal_CAIXA + Custos_indiretos_CAIXA + Lucro_CAIXA.
+
+2.3. Preço final
+
+Preço Final (€) = Preco_ATEN_BAFFLE + Preco_CAIXA.
+Esta deve ser a única fórmula usada para o preço global.
+
+Tabela ‘Preços Unitários Caixa’ no painel de administrador
+
+No painel de administrador:
+
+Elimina quaisquer entradas antigas de preços que não correspondam a esta lista.
+
+Garante que existe uma tabela/configuração editável com os seguintes campos (descrição + valor):
+
+‘Chapa 0.8mm (m2)’ – default 7,5
+
+‘Chapa 0.6mm (m2)’ – default 5,5
+
+‘Lã Knauf (m2)’ – default 6,5
+
+‘Lã Knauf s/ pelicula (m2)’ – default 4
+
+‘Perfil P30 (m.l)’ – default 1,3
+
+‘Cantos metálicos (un)’ – default 0,15
+
+‘Rebites (un)’ – default 0,02
+
+‘Palete + Embalagem (un)’ – default 4,5
+
+‘Mão de obra caixa (€/m2)’ – default calculado internamente a partir da fórmula
+=((2*B6*(B4+35) + 2*B6*(B2+35))/1000000)*4,5 + B2*B4*B6/1000000000*2
+mas no software basta ser um valor editável (ex.: 9,63).
+
+‘Mão de obra baffles (€/m2)’ – default 8 (ou valor que definires).
+
+‘Custos indiretos (%)’ – default 0,35
+
+‘Lucro (%)’ – default 0,15
+
+O admin deve poder:
+
+ver todos estes itens numa tabela;
+
+editar o valor de cada um;
+
+guardar, atualizando imediatamente os cálculos de preço.
+
+Restrições finais
+
+NÃO alterar qualquer outro cálculo (atenuação, perda de carga, ruído, etc.).
+
+NÃO mexer na estrutura do formulário inicial nem noutros ecrãs.
+
+Apenas criar/ajustar funções e modelos diretamente relacionados com:
+
+cálculo de preço conforme descrito;
+
+gestão dos ‘Preços Unitários Caixa’ no painel de administração.
+
+Quando terminares, mostra apenas:
+
+as funções de cálculo de preço criadas/alteradas;
+
+as alterações na parte de armazenamento/edição de ‘Preços Unitários Caixa’ no admin

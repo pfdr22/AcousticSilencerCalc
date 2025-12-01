@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 export default function Admin() {
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
-  const { data, updatePrecoCaixa, updatePrecoBaffle, updateAttenuation, updateConstant, resetData } = useData();
+  const { data, updatePrecoCaixa, updateAttenuation, updateConstant, resetData } = useData();
 
   if (!user || user.role !== 'admin') {
     setLocation('/admin/login');
@@ -37,8 +37,7 @@ export default function Admin() {
 
         <Tabs defaultValue="precos_caixa" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="precos_caixa" className="gap-2"><Box className="w-4 h-4"/> Preços Caixa</TabsTrigger>
-            <TabsTrigger value="precos_baffle" className="gap-2"><Layers className="w-4 h-4"/> Preços Baffle</TabsTrigger>
+            <TabsTrigger value="precos_caixa" className="gap-2"><Box className="w-4 h-4"/> Preços Unitários</TabsTrigger>
             <TabsTrigger value="atenuacao">Atenuação (Ref)</TabsTrigger>
             <TabsTrigger value="constantes">Constantes de Cálculo</TabsTrigger>
           </TabsList>
@@ -46,8 +45,8 @@ export default function Admin() {
           <TabsContent value="precos_caixa" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Preços Unitários Caixa</CardTitle>
-                <CardDescription>Materiais, serviços e fatores para o cálculo da caixa exterior.</CardDescription>
+                <CardTitle>Preços Unitários (Caixa e Baffles)</CardTitle>
+                <CardDescription>Materiais, serviços e fatores para o cálculo de preço.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -72,50 +71,6 @@ export default function Admin() {
                               step={item.tipo === 'fator' ? "1" : "0.01"}
                               value={item.valor} 
                               onChange={(e) => updatePrecoCaixa(item.id, Number(e.target.value))}
-                              className="h-8 w-24 text-right"
-                            />
-                            <span className="text-sm text-muted-foreground w-4">
-                              {item.tipo === 'fator' ? '%' : '€'}
-                            </span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="precos_baffle" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Preços Unitários Baffle</CardTitle>
-                <CardDescription>Materiais, serviços e fatores para o cálculo das células acústicas.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">ID</TableHead>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead className="w-[150px] text-right">Valor</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.pricing_baffle.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell className="font-medium">{item.descricao}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm capitalize">{item.tipo}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Input 
-                              type="number" 
-                              step={item.tipo === 'fator' ? "1" : "0.01"}
-                              value={item.valor} 
-                              onChange={(e) => updatePrecoBaffle(item.id, Number(e.target.value))}
                               className="h-8 w-24 text-right"
                             />
                             <span className="text-sm text-muted-foreground w-4">

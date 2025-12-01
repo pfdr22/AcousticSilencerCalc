@@ -1,8 +1,27 @@
+import { PrecoUnitarioCaixa, PrecoUnitarioBaffle } from '../types/schema';
+
+export const mockPrecosCaixa: PrecoUnitarioCaixa[] = [
+  { id: 1, descricao: "Chapa 0.8mm (m2)", tipo: "material", valor: 7.50 },
+  { id: 2, descricao: "Chapa 0.6mm (m2)", tipo: "material", valor: 5.50 },
+  { id: 3, descricao: "Lã Knauf (m2)", tipo: "material", valor: 6.50 },
+  { id: 4, descricao: "Lã Knauf s/ pelicula (m2)", tipo: "material", valor: 4.00 },
+  { id: 5, descricao: "Perfil P30 (m.l)", tipo: "material", valor: 1.30 },
+  { id: 6, descricao: "Cantos metálicos (un)", tipo: "material", valor: 0.15 },
+  { id: 7, descricao: "Rebites (un)", tipo: "material", valor: 0.02 },
+  { id: 8, descricao: "Palete + Embalagem (un)", tipo: "material", valor: 4.50 },
+  { id: 9, descricao: "Mão de obra caixa (€/m2)", tipo: "servico", valor: 9.63 }, // Default as example in prompt
+  { id: 10, descricao: "Mão de obra baffles (€/m2)", tipo: "servico", valor: 8.00 },
+  { id: 11, descricao: "Custos indiretos (%)", tipo: "fator", valor: 35 },
+  { id: 12, descricao: "Lucro (%)", tipo: "fator", valor: 15 },
+];
+
+// Keeping this empty/unused as we consolidated everything into PrecosCaixa as per instructions
+// or we can just map it to the same structure if needed by TS, but we will use PrecosCaixa for everything.
+export const mockPrecosBaffle: PrecoUnitarioBaffle[] = [];
+
 import { 
   RefAtenuacao, 
   ConstantesVdiPerdaCarga, 
-  PrecoUnitarioCaixa, 
-  PrecoUnitarioBaffle, 
   User 
 } from '../types/schema';
 
@@ -44,27 +63,6 @@ export const mockConstantesVdi: ConstantesVdiPerdaCarga[] = [
   { id: 1, espessura_mm: 100, a1: 0.235, a2: 0.017, b1: 0.012, b2: -2.70 }, // Using positive b1 as requested example
   { id: 2, espessura_mm: 200, a1: 0.255, a2: 0.015, b1: 0.012, b2: -2.91 },
   { id: 3, espessura_mm: 300, a1: 0.294, a2: 0.0167, b1: 0.012, b2: -2.95 },
-];
-
-export const mockPrecosCaixa: PrecoUnitarioCaixa[] = [
-  { id: 1, descricao: "Chapa 0.8mm (m2)", tipo: "material", valor: 6.00 },
-  { id: 2, descricao: "Perfil P30 (m.l)", tipo: "material", valor: 1.30 },
-  { id: 3, descricao: "Cantos metálicos (un)", tipo: "material", valor: 0.15 },
-  { id: 4, descricao: "Rebites (un)", tipo: "material", valor: 0.02 },
-  { id: 5, descricao: "Palete + Embalagem (un)", tipo: "material", valor: 4.50 },
-  { id: 6, descricao: "Mão de obra caixa (€/m2)", tipo: "servico", valor: 4.00 },
-  { id: 7, descricao: "Custos indiretos (%)", tipo: "fator", valor: 35 },
-  { id: 8, descricao: "Lucro (%)", tipo: "fator", valor: 15 },
-];
-
-export const mockPrecosBaffle: PrecoUnitarioBaffle[] = [
-  { id: 1, descricao: "Chapa 0.6mm (m2)", tipo: "material", valor: 4.00 },
-  { id: 2, descricao: "Lã Knauf (m2)", tipo: "material", valor: 8.00 },
-  { id: 3, descricao: "Lã Knauf s/ pelicula (m2)", tipo: "material", valor: 4.00 },
-  { id: 4, descricao: "Mão de obra baffles (€/m2)", tipo: "servico", valor: 5.00 },
-  { id: 5, descricao: "Mão de obra baffles lateral (€/m2)", tipo: "servico", valor: 5.00 },
-  { id: 6, descricao: "Custos indiretos (%)", tipo: "fator", valor: 35 },
-  { id: 7, descricao: "Lucro (%)", tipo: "fator", valor: 15 },
 ];
 
 export const mockUsers: User[] = [
