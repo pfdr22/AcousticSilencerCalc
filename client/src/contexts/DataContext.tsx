@@ -42,6 +42,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         if (!parsed.constants.pressure_loss) parsed.constants.pressure_loss = { a1: 0, a2: 0, b1: 0, b2: 0 };
         parsed.constants.pressure_loss.aerodynamic_factor = 0.5;
       }
+      
+      // Migration for Pricing Schema (v2)
+      // Check if new keys exist, if not, reset pricing to defaults
+      if (!parsed.pricing?.materials?.chapa_08_mm_m2) {
+        parsed.pricing = JSON.parse(JSON.stringify(PRICING_DB));
+      }
+
       setData(parsed);
     }
   }, []);

@@ -150,7 +150,8 @@ export default function Calculator() {
         depth_mm: formState.profundidade_mm
       },
       formState.numero_baffles,
-      formState.espessura_baffles_mm
+      formState.espessura_baffles_mm,
+      data.pricing // Pass the full pricing data from context
     );
 
     setAttenuationResult(attResult);

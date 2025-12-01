@@ -21,6 +21,25 @@ export default function Admin() {
     return null;
   }
 
+  // Helper to format key labels
+  const formatLabel = (key: string) => {
+    const labels: Record<string, string> = {
+      'chapa_08_mm_m2': 'Chapa 0.8mm (m²)',
+      'chapa_06_mm_m2': 'Chapa 0.6mm (m²)',
+      'la_knauf_m2': 'Lã Knauf (m²)',
+      'la_knauf_sem_pelicula_m2': 'Lã Knauf s/ película (m²)',
+      'perfil_p30_ml': 'Perfil P30 (m.l)',
+      'cantos_metalicos_un': 'Cantos metálicos (un)',
+      'rebites_un': 'Rebites (un)',
+      'palete_embalagem_un': 'Palete + Embalagem (un)',
+      'mao_obra_caixa_m2': 'Mão de obra caixa (€/m²)',
+      'mao_obra_baffles_m2': 'Mão de obra baffles (€/m²)',
+      'custos_indiretos': 'Custos indiretos (%)',
+      'lucro': 'Lucro (%)'
+    };
+    return labels[key] || key.replace(/_/g, ' ');
+  };
+
   return (
     <Layout>
       <div className="space-y-8 pb-20">
@@ -46,7 +65,7 @@ export default function Admin() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Materiais (Caixa e Baffles)</CardTitle>
+                  <CardTitle>Materiais</CardTitle>
                   <CardDescription>Preços por unidade de medida (€).</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -60,10 +79,11 @@ export default function Admin() {
                     <TableBody>
                       {Object.entries(data.pricing.materials).map(([key, value]) => (
                         <TableRow key={key}>
-                          <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                          <TableCell className="font-medium">{formatLabel(key)}</TableCell>
                           <TableCell>
                             <Input 
                               type="number" 
+                              step="0.01"
                               value={value} 
                               onChange={(e) => updatePricing('materials', key, Number(e.target.value))}
                               className="h-8 w-24 text-right"
@@ -80,23 +100,24 @@ export default function Admin() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Mão de Obra</CardTitle>
-                    <CardDescription>Custo por m².</CardDescription>
+                    <CardDescription>Custo por m² ou unidade.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Tipo</TableHead>
-                          <TableHead className="w-[120px]">Valor (€/m²)</TableHead>
+                          <TableHead className="w-[120px]">Valor (€)</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {Object.entries(data.pricing.labor).map(([key, value]) => (
                           <TableRow key={key}>
-                            <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                            <TableCell className="font-medium">{formatLabel(key)}</TableCell>
                             <TableCell>
                               <Input 
                                 type="number" 
+                                step="0.01"
                                 value={value} 
                                 onChange={(e) => updatePricing('labor', key, Number(e.target.value))}
                                 className="h-8 w-24 text-right"
@@ -112,7 +133,7 @@ export default function Admin() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Fatores e Margens</CardTitle>
-                    <CardDescription>Percentagens aplicadas ao cálculo.</CardDescription>
+                    <CardDescription>Percentagens aplicadas ao cálculo (Ex: 0.15 = 15%).</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -125,7 +146,7 @@ export default function Admin() {
                       <TableBody>
                         {Object.entries(data.pricing.factors).map(([key, value]) => (
                           <TableRow key={key}>
-                            <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                            <TableCell className="font-medium">{formatLabel(key)}</TableCell>
                             <TableCell>
                               <Input 
                                 type="number" 
@@ -224,4 +245,3 @@ export default function Admin() {
     </Layout>
   );
 }
-

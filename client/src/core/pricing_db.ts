@@ -1,22 +1,23 @@
 
 export const PRICING_DB = {
   materials: {
-    chapa_08_mm: 7.5,      // €/m2
-    chapa_06_mm: 5.5,      // €/m2
-    la_mineral: 6.5,       // €/m2
-    la_mineral_pelicula: 4.0, // €/m2 (Extra? Or standalone?) Assuming standalone base price or delta. Image says "Lã Knauf s/ pelicula" 4. Let's assume 6.5 is with? Or standard.
-    perfil_p30: 1.3,       // €/m
-    cantos: 0.15,          // €/un
-    rebites: 0.02,         // €/un
-    palete_embalagem: 4.5, // €/un
+    'chapa_08_mm_m2': 7.5,
+    'chapa_06_mm_m2': 5.5,
+    'la_knauf_m2': 6.5,
+    'la_knauf_sem_pelicula_m2': 4.0,
+    'perfil_p30_ml': 1.3,
+    'cantos_metalicos_un': 0.15,
+    'rebites_un': 0.02,
+    'palete_embalagem_un': 4.5,
   },
   labor: {
-    caixa_m2: 4.5,         // €/m2 of box surface
-    baffle_m2: 5.0,        // €/m2 of baffle surface (estimated)
+    'mao_obra_caixa_m2': 9.63,
+    'mao_obra_baffles_m2': 8.0,
   },
   factors: {
-    waste_chapa: 1.2,      // 20% waste
-    indirect_costs: 0.35,  // 35%
-    profit_margin: 0.15    // 15%
+    'custos_indiretos': 0.35,
+    'lucro': 0.15
   }
 };
+
+export type PricingData = typeof PRICING_DB;
