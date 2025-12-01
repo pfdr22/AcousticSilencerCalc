@@ -45,11 +45,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           fixed lg:static z-50 top-0 left-0 h-full w-64 
           bg-sidebar border-r border-sidebar-border 
           transition-transform duration-200 ease-in-out
-          flex flex-col
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        <div className="h-16 flex items-center px-6 border-b border-sidebar-border flex-shrink-0">
+        <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           <div className="flex items-center gap-2.5 w-full">
             <img 
               src={logoImage} 
@@ -65,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+        <nav className="p-4 space-y-1">
           {navItems.map((item) => {
             const isActive = location === item.href;
             return (
@@ -87,7 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="w-full p-4 border-t border-sidebar-border bg-sidebar/50 backdrop-blur-sm flex-shrink-0">
+        <div className="absolute bottom-0 left-0 w-full p-4 border-t border-sidebar-border bg-sidebar/50 backdrop-blur-sm">
           <div className="flex items-center gap-3 px-2">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold">
               AD

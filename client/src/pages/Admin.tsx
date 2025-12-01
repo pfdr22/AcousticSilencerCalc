@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Save, Settings2, Box, Layers } from "lucide-react";
+import { RefreshCw, Save, Settings2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 export default function Admin() {
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
-  const { data, updatePrecoCaixa, updateAttenuation, updateConstant, resetData } = useData();
+  const { data, updatePricing, updateAttenuation, updateConstant, resetData } = useData();
 
   if (!user || user.role !== 'admin') {
     setLocation('/admin/login');
@@ -35,55 +35,114 @@ export default function Admin() {
           </Button>
         </div>
 
-        <Tabs defaultValue="precos_caixa" className="space-y-4">
+        <Tabs defaultValue="precos" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="precos_caixa" className="gap-2"><Box className="w-4 h-4"/> Preços Unitários</TabsTrigger>
+            <TabsTrigger value="precos">Preços Unitários</TabsTrigger>
             <TabsTrigger value="atenuacao">Atenuação (Ref)</TabsTrigger>
             <TabsTrigger value="constantes">Constantes de Cálculo</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="precos_caixa" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Preços Unitários (Caixa e Baffles)</CardTitle>
-                <CardDescription>Materiais, serviços e fatores para o cálculo de preço.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">ID</TableHead>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead className="w-[150px] text-right">Valor</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.pricing_caixa.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell className="font-medium">{item.descricao}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm capitalize">{item.tipo}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
+          <TabsContent value="precos" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Materiais (Caixa e Baffles)</CardTitle>
+                  <CardDescription>Preços por unidade de medida (€).</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead className="w-[120px]">Valor (€)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Object.entries(data.pricing.materials).map(([key, value]) => (
+                        <TableRow key={key}>
+                          <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                          <TableCell>
                             <Input 
                               type="number" 
-                              step={item.tipo === 'fator' ? "1" : "0.01"}
-                              value={item.valor} 
-                              onChange={(e) => updatePrecoCaixa(item.id, Number(e.target.value))}
+                              value={value} 
+                              onChange={(e) => updatePricing('materials', key, Number(e.target.value))}
                               className="h-8 w-24 text-right"
                             />
-                            <span className="text-sm text-muted-foreground w-4">
-                              {item.tipo === 'fator' ? '%' : '€'}
-                            </span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mão de Obra</CardTitle>
+                    <CardDescription>Custo por m².</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead className="w-[120px]">Valor (€/m²)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {Object.entries(data.pricing.labor).map(([key, value]) => (
+                          <TableRow key={key}>
+                            <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                            <TableCell>
+                              <Input 
+                                type="number" 
+                                value={value} 
+                                onChange={(e) => updatePricing('labor', key, Number(e.target.value))}
+                                className="h-8 w-24 text-right"
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Fatores e Margens</CardTitle>
+                    <CardDescription>Percentagens aplicadas ao cálculo.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Fator</TableHead>
+                          <TableHead className="w-[120px]">Valor (Dec)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {Object.entries(data.pricing.factors).map(([key, value]) => (
+                          <TableRow key={key}>
+                            <TableCell className="font-medium capitalize">{key.replace(/_/g, ' ')}</TableCell>
+                            <TableCell>
+                              <Input 
+                                type="number" 
+                                step="0.01"
+                                value={value} 
+                                onChange={(e) => updatePricing('factors', key, Number(e.target.value))}
+                                className="h-8 w-24 text-right"
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="atenuacao">
@@ -165,3 +224,4 @@ export default function Admin() {
     </Layout>
   );
 }
+
