@@ -344,7 +344,7 @@ export default function Calculator() {
                              </TableHeader>
                              <TableBody>
                                <TableRow>
-                                 <TableCell className="font-medium text-xs text-muted-foreground">L_up (Entrada) [LW(A)]</TableCell>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">L_up (Entrada)</TableCell>
                                  {FREQUENCIES.map(f => (
                                    <TableCell key={f} className="text-center text-xs text-muted-foreground">
                                      {downstreamNoiseResult.bandas[f]?.L_up.toFixed(1)}
@@ -352,7 +352,7 @@ export default function Calculator() {
                                  ))}
                                </TableRow>
                                <TableRow>
-                                 <TableCell className="font-medium text-xs text-muted-foreground">D_est (Atenuação) [LW(A)]</TableCell>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">D_est (Atenuação)</TableCell>
                                  {FREQUENCIES.map(f => (
                                    <TableCell key={f} className="text-center text-xs text-muted-foreground">
                                      -{downstreamNoiseResult.bandas[f]?.D_est.toFixed(1)}
@@ -360,7 +360,7 @@ export default function Calculator() {
                                  ))}
                                </TableRow>
                                <TableRow>
-                                 <TableCell className="font-medium text-xs text-muted-foreground">L_reg (Regenerado) [LW(A)]</TableCell>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">L_reg (Regenerado)</TableCell>
                                  {FREQUENCIES.map(f => (
                                    <TableCell key={f} className="text-center text-xs text-muted-foreground">
                                      {downstreamNoiseResult.bandas[f]?.L_reg.toFixed(1)}
@@ -368,7 +368,7 @@ export default function Calculator() {
                                  ))}
                                </TableRow>
                                <TableRow className="bg-blue-50/50 dark:bg-blue-900/20 border-t-2 border-blue-100 dark:border-blue-800">
-                                 <TableCell className="font-bold text-blue-700 dark:text-blue-400">L_down (Saída) [LW(A)]</TableCell>
+                                 <TableCell className="font-bold text-blue-700 dark:text-blue-400">L_down (Saída)</TableCell>
                                  {FREQUENCIES.map(f => (
                                    <TableCell key={f} className="text-center font-bold text-blue-700 dark:text-blue-400">
                                      {downstreamNoiseResult.bandas[f]?.L_down.toFixed(1)}
