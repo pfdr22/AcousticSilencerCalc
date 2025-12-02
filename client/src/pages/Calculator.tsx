@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Layout from "@/components/Layout";
 import { useData } from "@/contexts/DataContext"; // Import useData
+import { useAuth } from "@/contexts/AuthContext"; // Import useAuth for admin check
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +61,7 @@ const getBaffleCountLetter = (n: number): string => {
 
 export default function Calculator() {
   const { data } = useData(); // Get global data
+  const { admin } = useAuth(); // Get admin status
   const [formState, setFormState] = useState<CalculatorState>({
     largura_mm: 1200,
     altura_mm: 800,
@@ -407,52 +409,53 @@ export default function Calculator() {
                 <div className="mt-8">
                    <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div>
-                      <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Final Estimado</h3>
-                      <p className="text-sm text-muted-foreground">Inclui materiais, mão de obra e custos indiretos.</p>
+                      <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço</h3>
                     </div>
                     <div className="text-5xl font-bold text-green-700 dark:text-green-400">
                       {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
                     </div>
                   </div>
 
-                  <Accordion type="single" collapsible className="w-full mt-4">
-                    <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
-                      <AccordionTrigger className="hover:no-underline py-3">
-                        <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
-                      </AccordionTrigger>
-                      <AccordionContent className="pb-4 pt-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
-                              <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                  {admin && (
+                    <Accordion type="single" collapsible className="w-full mt-4">
+                      <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
+                        <AccordionTrigger className="hover:no-underline py-3">
+                          <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 pt-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                            <div className="space-y-2">
+                              <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
+                                <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
+                                <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
+                              </div>
+                              <div className="flex justify-between font-medium pt-1 border-t">
+                                <span>Subtotal Direto:</span>
+                                <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
-                              <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
-                            </div>
-                            <div className="flex justify-between font-medium pt-1 border-t">
-                              <span>Subtotal Direto:</span>
-                              <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+                            
+                            <div className="space-y-2">
+                              <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Custos Indiretos:</span>
+                                <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Margem de Lucro:</span>
+                                <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
+                              </div>
                             </div>
                           </div>
-                          
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Custos Indiretos:</span>
-                              <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Margem de Lucro:</span>
-                              <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
-                            </div>
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  )}
                 </div>
               )}
             </CardContent>
