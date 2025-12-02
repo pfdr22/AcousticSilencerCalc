@@ -255,9 +255,60 @@ export default function Calculator() {
                   <div>
                     <CardTitle>Relatório de Cálculo</CardTitle>
                     <CardDescription>Data: {new Date().toLocaleDateString('pt-PT')} {new Date().toLocaleTimeString('pt-PT')}</CardDescription>
+                    <p className="text-sm mt-1">
+                      Modelo: <span className="font-mono font-bold text-foreground">{calculations.modelName}</span>
+                    </p>
                   </div>
                   {admin && <div className="text-sm text-muted-foreground">Utilizador: Admin</div>}
                 </div>
+
+                {/* INPUT PARAMETERS SECTION FOR PDF */}
+                <Card className="mb-8 border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-50 dark:bg-slate-900/50 break-inside-avoid">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Dados de Entrada</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                      <div>
+                        <span className="text-muted-foreground block mb-1">Dimensões (L x A x P)</span>
+                        <span className="font-mono font-medium">
+                          {formState.largura_mm} x {formState.altura_mm} x {formState.profundidade_mm} mm
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block mb-1">Baffles</span>
+                        <span className="font-mono font-medium">
+                          {formState.numero_baffles} un. @ {formState.espessura_baffles_mm} mm
+                        </span>
+                      </div>
+                       <div>
+                        <span className="text-muted-foreground block mb-1">Caudal de Ar</span>
+                        <span className="font-mono font-medium">
+                          {formState.caudal_m3_h} m³/h
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block mb-1">Velocidade de Face</span>
+                        <span className="font-mono font-medium">
+                          {calculations.velocidade_ms} m/s
+                        </span>
+                      </div>
+                       <div>
+                        <span className="text-muted-foreground block mb-1">Área Livre</span>
+                        <span className="font-mono font-medium">
+                          {calculations.area_livre_m2} m²
+                        </span>
+                      </div>
+                      <div>
+                         <span className="text-muted-foreground block mb-1">Gap entre Baffles</span>
+                        <span className="font-mono font-medium">
+                          {calculations.gap_mm} mm
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <CardTitle>Atenuação Estimada por Banda (dB)</CardTitle>
                 <CardDescription>Cálculo baseado na geometria e espessura dos baffles.</CardDescription>
               </CardHeader>
