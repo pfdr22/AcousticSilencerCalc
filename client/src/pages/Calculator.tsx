@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Layout from "@/components/Layout";
 import { useData } from "@/contexts/DataContext"; // Import useData
 import { useAuth } from "@/contexts/AuthContext"; // Import useAuth for admin check
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3 } from "lucide-react";
+import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +20,8 @@ import { calcular_preco_final, FinalPriceResult } from "@/core/pricing";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 // Types
 type Thickness = 100 | 200 | 300;
@@ -79,6 +81,22 @@ export default function Calculator() {
   const [regeneratedNoiseResult, setRegeneratedNoiseResult] = useState<RegeneratedNoiseResult | null>(null);
   const [downstreamNoiseResult, setDownstreamNoiseResult] = useState<DownstreamNoiseResult | null>(null);
   const [finalPriceResult, setFinalPriceResult] = useState<FinalPriceResult | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPDF = () => {
+    const element = resultsRef.current;
+    if (!element) return;
+
+    const opt = {
+      margin: 10,
+      filename: `Relatório_Silenciador_${new Date().toISOString().slice(0,10)}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().from(element).set(opt).save();
+  };
 
   const calculations = useMemo(() => {
     const { largura_mm, altura_mm, espessura_baffles_mm, numero_baffles, caudal_m3_h, profundidade_mm } = formState;
@@ -221,245 +239,261 @@ export default function Calculator() {
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Atenuação Estimada por Banda (dB)</CardTitle>
-              <CardDescription>Cálculo baseado na geometria e espessura dos baffles.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
-                    {FREQUENCIES.map(f => <TableHead key={f} className="text-center">{f}</TableHead>)}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">D_est (dB)</TableCell>
-                    {FREQUENCIES.map(f => (
-                      <TableCell key={f} className="text-center font-bold text-primary">
-                        {attenuationResult.bandas[f]?.d_est?.toFixed(1) || '-'}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableBody>
-              </Table>
-
-              <Card className="mt-8 border-slate-200 dark:border-slate-800 shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Ruído Regenerado (Flow Noise)</CardTitle>
-                  <CardDescription>Potência sonora gerada pelo escoamento (VDI 2081).</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
-                        {FREQUENCIES.map(f => <TableHead key={f} className="text-center h-8">{f}</TableHead>)}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium py-2">LwA (dB)</TableCell>
-                        {FREQUENCIES.map(f => (
-                          <TableCell key={f} className="text-center font-mono text-sm py-2">
-                            {regeneratedNoiseResult?.bandas[f]?.L_w_A_band?.toFixed(1) || '-'}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                      <TableRow className="bg-muted/30">
-                        <TableCell className="font-medium text-muted-foreground py-2 text-xs">Lw Linear (dB)</TableCell>
-                        {FREQUENCIES.map(f => (
-                          <TableCell key={f} className="text-center text-xs text-muted-foreground py-2">
-                            {regeneratedNoiseResult?.bandas[f]?.L_w_okt?.toFixed(1) || '-'}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-
-                  <div className="mt-4 flex justify-end">
-                    <div className="text-right">
-                      <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">LwA Global</span>
-                      <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                        {regeneratedNoiseResult?.L_w_A_global} <span className="text-sm font-sans font-normal text-muted-foreground">dB(A)</span>
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* NEW DOWNSTREAM NOISE SECTION */}
-              {downstreamNoiseResult && (
-                 <Card className="mt-8 border-blue-200 dark:border-blue-800 shadow-md">
-                   <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20 pb-4">
-                     <CardTitle className="text-blue-700 dark:text-blue-400">Ruído a Jusante (L_down)</CardTitle>
-                     <CardDescription>Nível sonoro final após silenciador, considerando atenuação e ruído regenerado.</CardDescription>
-                   </CardHeader>
-                   <CardContent className="pt-6">
-                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                       <div className="xl:col-span-2">
-                         <Table>
-                           <TableHeader>
-                             <TableRow>
-                               <TableHead className="w-[100px]">Frequência (Hz)</TableHead>
-                               {FREQUENCIES.map(f => <TableHead key={f} className="text-center text-xs">{f}</TableHead>)}
-                             </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                             <TableRow>
-                               <TableCell className="font-medium text-xs text-muted-foreground">L_up (Entrada) [LW(A)]</TableCell>
-                               {FREQUENCIES.map(f => (
-                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
-                                   {downstreamNoiseResult.bandas[f]?.L_up.toFixed(1)}
-                                 </TableCell>
-                               ))}
-                             </TableRow>
-                             <TableRow>
-                               <TableCell className="font-medium text-xs text-muted-foreground">D_est (Atenuação) [LW(A)]</TableCell>
-                               {FREQUENCIES.map(f => (
-                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
-                                   -{downstreamNoiseResult.bandas[f]?.D_est.toFixed(1)}
-                                 </TableCell>
-                               ))}
-                             </TableRow>
-                             <TableRow>
-                               <TableCell className="font-medium text-xs text-muted-foreground">L_reg (Regenerado) [LW(A)]</TableCell>
-                               {FREQUENCIES.map(f => (
-                                 <TableCell key={f} className="text-center text-xs text-muted-foreground">
-                                   {downstreamNoiseResult.bandas[f]?.L_reg.toFixed(1)}
-                                 </TableCell>
-                               ))}
-                             </TableRow>
-                             <TableRow className="bg-blue-50/50 dark:bg-blue-900/20 border-t-2 border-blue-100 dark:border-blue-800">
-                               <TableCell className="font-bold text-blue-700 dark:text-blue-400">L_down (Saída) [LW(A)]</TableCell>
-                               {FREQUENCIES.map(f => (
-                                 <TableCell key={f} className="text-center font-bold text-blue-700 dark:text-blue-400">
-                                   {downstreamNoiseResult.bandas[f]?.L_down.toFixed(1)}
-                                 </TableCell>
-                               ))}
-                             </TableRow>
-                           </TableBody>
-                         </Table>
-                       </div>
-                       
-                       <div className="h-[250px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800">
-                         <ResponsiveContainer width="100%" height="100%">
-                           <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                             <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-                             <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} width={30} />
-                             <Tooltip 
-                               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                               labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
-                             />
-                             <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                             <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" />
-                             <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" />
-                             <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" />
-                           </LineChart>
-                         </ResponsiveContainer>
-                       </div>
-                     </div>
-
-                     <div className="mt-6 flex justify-end items-center gap-4">
-                        <div className="text-right">
-                          <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">L_down Global</span>
-                          <span className="text-3xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                            {downstreamNoiseResult.L_down_global} <span className="text-lg font-sans font-normal text-muted-foreground">dB{formState.noiseMode === 'LWA' ? '(A)' : ''}</span>
-                          </span>
-                        </div>
-                     </div>
-                   </CardContent>
-                 </Card>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                {/* Atenuação Global */}
-                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
+          <div ref={resultsRef}>
+            <Card className="border-0 shadow-none">
+              <CardHeader className="px-0 pt-0">
+                <div className="flex justify-between items-center border-b pb-4 mb-4">
                   <div>
-                    <h3 className="font-semibold text-primary">Atenuação Global</h3>
-                    <p className="text-sm text-muted-foreground">Soma logarítmica</p>
+                    <CardTitle>Relatório de Cálculo</CardTitle>
+                    <CardDescription>Data: {new Date().toLocaleDateString('pt-PT')} {new Date().toLocaleTimeString('pt-PT')}</CardDescription>
                   </div>
-                  <div className="text-4xl font-bold text-primary">
-                    {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
-                  </div>
+                  {admin && <div className="text-sm text-muted-foreground">Utilizador: Admin</div>}
                 </div>
+                <CardTitle>Atenuação Estimada por Banda (dB)</CardTitle>
+                <CardDescription>Cálculo baseado na geometria e espessura dos baffles.</CardDescription>
+              </CardHeader>
+              <CardContent className="px-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
+                      {FREQUENCIES.map(f => <TableHead key={f} className="text-center">{f}</TableHead>)}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">D_est (dB)</TableCell>
+                      {FREQUENCIES.map(f => (
+                        <TableCell key={f} className="text-center font-bold text-primary">
+                          {attenuationResult.bandas[f]?.d_est?.toFixed(1) || '-'}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableBody>
+                </Table>
 
-                {/* Perda de Carga */}
-                {pressureLossResult && (
-                  <div className="p-4 bg-orange-500/5 rounded-lg border border-orange-500/20 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-orange-600 dark:text-orange-400">Perda de Carga (Δp)</h3>
-                      <p className="text-sm text-muted-foreground">Coeficiente ζ: {pressureLossResult.zeta}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Fator Aero: {data.constants.pressure_loss.aerodynamic_factor}
-                      </p>
-                    </div>
-                    <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
-                      {pressureLossResult.delta_p_Pa} <span className="text-xl font-normal text-muted-foreground">Pa</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <Card className="mt-8 border-slate-200 dark:border-slate-800 shadow-sm break-inside-avoid">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Ruído Regenerado (Flow Noise)</CardTitle>
+                    <CardDescription>Potência sonora gerada pelo escoamento (VDI 2081).</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[150px]">Frequência (Hz)</TableHead>
+                          {FREQUENCIES.map(f => <TableHead key={f} className="text-center h-8">{f}</TableHead>)}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium py-2">LwA (dB)</TableCell>
+                          {FREQUENCIES.map(f => (
+                            <TableCell key={f} className="text-center font-mono text-sm py-2">
+                              {regeneratedNoiseResult?.bandas[f]?.L_w_A_band?.toFixed(1) || '-'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow className="bg-muted/30">
+                          <TableCell className="font-medium text-muted-foreground py-2 text-xs">Lw Linear (dB)</TableCell>
+                          {FREQUENCIES.map(f => (
+                            <TableCell key={f} className="text-center text-xs text-muted-foreground py-2">
+                              {regeneratedNoiseResult?.bandas[f]?.L_w_okt?.toFixed(1) || '-'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableBody>
+                    </Table>
 
-              {/* PREÇO FINAL */}
-              {finalPriceResult && (
-                <div className="mt-8">
-                   <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                    <div>
-                      <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço</h3>
+                    <div className="mt-4 flex justify-end">
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">LwA Global</span>
+                        <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
+                          {regeneratedNoiseResult?.L_w_A_global} <span className="text-sm font-sans font-normal text-muted-foreground">dB(A)</span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-5xl font-bold text-green-700 dark:text-green-400">
-                      {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
-                    </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  {admin && (
-                    <Accordion type="single" collapsible className="w-full mt-4">
-                      <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
-                        <AccordionTrigger className="hover:no-underline py-3">
-                          <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-4 pt-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                            <div className="space-y-2">
-                              <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
-                                <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
-                                <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
-                              </div>
-                              <div className="flex justify-between font-medium pt-1 border-t">
-                                <span>Subtotal Direto:</span>
-                                <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Custos Indiretos:</span>
-                                <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Margem de Lucro:</span>
-                                <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
-                              </div>
-                            </div>
+                {/* NEW DOWNSTREAM NOISE SECTION */}
+                {downstreamNoiseResult && (
+                   <Card className="mt-8 border-blue-200 dark:border-blue-800 shadow-md break-inside-avoid">
+                     <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20 pb-4">
+                       <CardTitle className="text-blue-700 dark:text-blue-400">Ruído a Jusante (L_down)</CardTitle>
+                       <CardDescription>Nível sonoro final após silenciador, considerando atenuação e ruído regenerado.</CardDescription>
+                     </CardHeader>
+                     <CardContent className="pt-6">
+                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                         <div className="xl:col-span-2">
+                           <Table>
+                             <TableHeader>
+                               <TableRow>
+                                 <TableHead className="w-[100px]">Frequência (Hz)</TableHead>
+                                 {FREQUENCIES.map(f => <TableHead key={f} className="text-center text-xs">{f}</TableHead>)}
+                               </TableRow>
+                             </TableHeader>
+                             <TableBody>
+                               <TableRow>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">L_up (Entrada) [LW(A)]</TableCell>
+                                 {FREQUENCIES.map(f => (
+                                   <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                     {downstreamNoiseResult.bandas[f]?.L_up.toFixed(1)}
+                                   </TableCell>
+                                 ))}
+                               </TableRow>
+                               <TableRow>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">D_est (Atenuação) [LW(A)]</TableCell>
+                                 {FREQUENCIES.map(f => (
+                                   <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                     -{downstreamNoiseResult.bandas[f]?.D_est.toFixed(1)}
+                                   </TableCell>
+                                 ))}
+                               </TableRow>
+                               <TableRow>
+                                 <TableCell className="font-medium text-xs text-muted-foreground">L_reg (Regenerado) [LW(A)]</TableCell>
+                                 {FREQUENCIES.map(f => (
+                                   <TableCell key={f} className="text-center text-xs text-muted-foreground">
+                                     {downstreamNoiseResult.bandas[f]?.L_reg.toFixed(1)}
+                                   </TableCell>
+                                 ))}
+                               </TableRow>
+                               <TableRow className="bg-blue-50/50 dark:bg-blue-900/20 border-t-2 border-blue-100 dark:border-blue-800">
+                                 <TableCell className="font-bold text-blue-700 dark:text-blue-400">L_down (Saída) [LW(A)]</TableCell>
+                                 {FREQUENCIES.map(f => (
+                                   <TableCell key={f} className="text-center font-bold text-blue-700 dark:text-blue-400">
+                                     {downstreamNoiseResult.bandas[f]?.L_down.toFixed(1)}
+                                   </TableCell>
+                                 ))}
+                               </TableRow>
+                             </TableBody>
+                           </Table>
+                         </div>
+                         
+                         <div className="h-[250px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800">
+                           <ResponsiveContainer width="100%" height="100%">
+                             <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
+                               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                               <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
+                               <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} width={30} />
+                               <Tooltip 
+                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                 labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
+                               />
+                               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                               <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" />
+                               <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" />
+                               <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" />
+                             </LineChart>
+                           </ResponsiveContainer>
+                         </div>
+                       </div>
+
+                       <div className="mt-6 flex justify-end items-center gap-4">
+                          <div className="text-right">
+                            <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">L_down Global</span>
+                            <span className="text-3xl font-bold font-mono text-blue-600 dark:text-blue-400">
+                              {downstreamNoiseResult.L_down_global} <span className="text-lg font-sans font-normal text-muted-foreground">dB{formState.noiseMode === 'LWA' ? '(A)' : ''}</span>
+                            </span>
                           </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                       </div>
+                     </CardContent>
+                   </Card>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 break-inside-avoid">
+                  {/* Atenuação Global */}
+                  <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-primary">Atenuação Global</h3>
+                      <p className="text-sm text-muted-foreground">Soma logarítmica</p>
+                    </div>
+                    <div className="text-4xl font-bold text-primary">
+                      {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
+                    </div>
+                  </div>
+
+                  {/* Perda de Carga */}
+                  {pressureLossResult && (
+                    <div className="p-4 bg-orange-500/5 rounded-lg border border-orange-500/20 flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-orange-600 dark:text-orange-400">Perda de Carga (Δp)</h3>
+                        <p className="text-sm text-muted-foreground">Coeficiente ζ: {pressureLossResult.zeta}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Fator Aero: {data.constants.pressure_loss.aerodynamic_factor}
+                        </p>
+                      </div>
+                      <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
+                        {pressureLossResult.delta_p_Pa} <span className="text-xl font-normal text-muted-foreground">Pa</span>
+                      </div>
+                    </div>
                   )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+
+                {/* PREÇO FINAL */}
+                {finalPriceResult && (
+                  <div className="mt-8 break-inside-avoid">
+                     <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                      <div>
+                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço</h3>
+                      </div>
+                      <div className="text-5xl font-bold text-green-700 dark:text-green-400">
+                        {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
+                      </div>
+                    </div>
+
+                    {admin && (
+                      <Accordion type="single" collapsible className="w-full mt-4">
+                        <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
+                          <AccordionTrigger className="hover:no-underline py-3">
+                            <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-4 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
+                                  <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
+                                  <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
+                                </div>
+                                <div className="flex justify-between font-medium pt-1 border-t">
+                                  <span>Subtotal Direto:</span>
+                                  <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Custos Indiretos:</span>
+                                  <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Margem de Lucro:</span>
+                                  <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
+                                </div>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-end mt-8">
+            <Button onClick={handleExportPDF} className="gap-2" size="lg">
+              <Download className="h-4 w-4" />
+              Exportar em PDF
+            </Button>
+          </div>
         </div>
       </Layout>
     );
