@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,17 +6,78 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Save, Settings2 } from "lucide-react";
+import { RefreshCw, Save, Settings2, Users, UserPlus, Check, X as XIcon, Trash2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
+import { api } from "@/api/mockApi";
+import { User } from "@/types/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 
 export default function Admin() {
-  const { user } = useAuth();
+  const { admin } = useAuth();
   const [_, setLocation] = useLocation();
   const { data, updatePricing, updateAttenuation, updateConstant, resetData } = useData();
+  const [users, setUsers] = useState<User[]>([]);
+  const [isUsersLoading, setIsUsersLoading] = useState(false);
+  const [newUserOpen, setNewUserOpen] = useState(false);
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
 
-  if (!user || user.role !== 'admin') {
+  useEffect(() => {
+    if (admin) {
+      loadUsers();
+    }
+  }, [admin]);
+
+  const loadUsers = async () => {
+    setIsUsersLoading(true);
+    try {
+      const list = await api.users.list();
+      setUsers(list);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUsersLoading(false);
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password) return;
+    try {
+      await api.users.create({
+        name: newUser.name,
+        email: newUser.email,
+        role: 'user',
+        active: true,
+        passwordHash: newUser.password // In mock, storing plain for simplicity or hashed
+      });
+      setNewUserOpen(false);
+      setNewUser({ name: "", email: "", password: "" });
+      loadUsers();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggleUserStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      await api.users.update(id, { active: !currentStatus });
+      loadUsers();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  if (!admin) {
     setLocation('/admin/login');
     return null;
   }
@@ -46,7 +107,7 @@ export default function Admin() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Painel de Administração</h1>
-            <p className="text-muted-foreground mt-2">Gestão de preços e parâmetros de cálculo.</p>
+            <p className="text-muted-foreground mt-2">Gestão de preços, utilizadores e parâmetros.</p>
           </div>
           <Button variant="outline" onClick={resetData} className="gap-2">
             <RefreshCw className="w-4 h-4" />
@@ -54,12 +115,122 @@ export default function Admin() {
           </Button>
         </div>
 
-        <Tabs defaultValue="precos" className="space-y-4">
+        <Tabs defaultValue="users" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="w-4 h-4" />
+              Utilizadores
+            </TabsTrigger>
             <TabsTrigger value="precos">Preços Unitários</TabsTrigger>
             <TabsTrigger value="atenuacao">Atenuação (Ref)</TabsTrigger>
             <TabsTrigger value="constantes">Constantes de Cálculo</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="users" className="space-y-4">
+             <Card>
+               <CardHeader className="flex flex-row items-center justify-between">
+                 <div>
+                   <CardTitle>Gestão de Utilizadores</CardTitle>
+                   <CardDescription>Contas de acesso à Calculadora.</CardDescription>
+                 </div>
+                 <Dialog open={newUserOpen} onOpenChange={setNewUserOpen}>
+                   <DialogTrigger asChild>
+                     <Button className="gap-2">
+                       <UserPlus className="w-4 h-4" />
+                       Novo Utilizador
+                     </Button>
+                   </DialogTrigger>
+                   <DialogContent>
+                     <DialogHeader>
+                       <DialogTitle>Criar Utilizador</DialogTitle>
+                       <DialogDescription>
+                         Adicionar novo acesso à calculadora.
+                       </DialogDescription>
+                     </DialogHeader>
+                     <div className="space-y-4 py-4">
+                       <div className="space-y-2">
+                         <Label>Nome</Label>
+                         <Input 
+                           value={newUser.name} 
+                           onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                           placeholder="Ex: João Silva"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label>Email</Label>
+                         <Input 
+                           type="email"
+                           value={newUser.email} 
+                           onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                           placeholder="joao@empresa.com"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label>Password Inicial</Label>
+                         <Input 
+                           type="text" // Visible for admin convenience as requested "password inicial"
+                           value={newUser.password} 
+                           onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                           placeholder="Senha123"
+                         />
+                       </div>
+                     </div>
+                     <DialogFooter>
+                       <Button onClick={handleCreateUser}>Criar Conta</Button>
+                     </DialogFooter>
+                   </DialogContent>
+                 </Dialog>
+               </CardHeader>
+               <CardContent>
+                 <Table>
+                   <TableHeader>
+                     <TableRow>
+                       <TableHead>Nome</TableHead>
+                       <TableHead>Email</TableHead>
+                       <TableHead>Role</TableHead>
+                       <TableHead>Status</TableHead>
+                       <TableHead className="text-right">Ações</TableHead>
+                     </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                     {users.filter(u => u.role !== 'admin').map((u) => (
+                       <TableRow key={u.id}>
+                         <TableCell className="font-medium">{u.name || 'Sem Nome'}</TableCell>
+                         <TableCell>{u.email}</TableCell>
+                         <TableCell>
+                           <span className="px-2 py-1 rounded-full bg-slate-100 text-xs font-medium">User</span>
+                         </TableCell>
+                         <TableCell>
+                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                             {u.active ? 'Ativo' : 'Inativo'}
+                           </span>
+                         </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex justify-end gap-2">
+                             <Button 
+                               variant="outline" 
+                               size="sm"
+                               className={u.active ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}
+                               onClick={() => toggleUserStatus(u.id, u.active)}
+                             >
+                               {u.active ? 'Desativar' : 'Ativar'}
+                             </Button>
+                           </div>
+                         </TableCell>
+                       </TableRow>
+                     ))}
+                     {users.filter(u => u.role !== 'admin').length === 0 && (
+                       <TableRow>
+                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                           Nenhum utilizador registado.
+                         </TableCell>
+                       </TableRow>
+                     )}
+                   </TableBody>
+                 </Table>
+               </CardContent>
+             </Card>
+          </TabsContent>
 
           <TabsContent value="precos" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

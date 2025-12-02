@@ -30,7 +30,9 @@ export interface PrecoUnitarioBaffle {
 
 export interface User {
   id: number;
-  username: string;
+  name: string;
+  email: string;
   role: 'admin' | 'user';
-  // password_hash omitted for frontend mock security
+  active: boolean;
+  passwordHash?: string; // Simplified, in real app this is hidden
 }

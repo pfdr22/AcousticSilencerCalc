@@ -1,21 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { api } from '@/api/mockApi';
+import { User } from '@/types/schema';
 
-// Simulated Admin Config
 const ADMIN_EMAIL = "hneves@rha-technologies.pt";
-// In a real app, this would be a bcrypt hash on the server. 
-// Here we simulate the hash verification.
 const ADMIN_PASSWORD_MOCK_HASH = "Admin123!"; 
 
-interface User {
+interface AdminUser {
   email: string;
   role: 'admin';
 }
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, pass: string) => Promise<boolean>;
-  logout: () => void;
+  user: User | null; // Normal User
+  admin: AdminUser | null; // Admin Session
+  loginUser: (email: string, pass: string) => Promise<boolean>;
+  logoutUser: () => void;
+  loginAdmin: (email: string, pass: string) => Promise<boolean>;
+  logoutAdmin: () => void;
   isLoading: boolean;
 }
 
@@ -23,52 +25,78 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useLocation();
 
-  // Simulate Session Check on Mount (GET /api/admin/me)
+  // Restore sessions
   useEffect(() => {
-    const checkSession = async () => {
-      // Simulate network delay
+    const restoreSessions = async () => {
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Check "cookie" (simulated by localStorage for mockup)
-      const stored = localStorage.getItem('mock_session_id');
-      if (stored) {
-        // If session exists, restore user
-        setUser({ email: ADMIN_EMAIL, role: 'admin' });
+      // Restore Admin
+      const adminSession = localStorage.getItem('mock_admin_session');
+      if (adminSession) {
+        setAdmin({ email: ADMIN_EMAIL, role: 'admin' });
       }
+
+      // Restore User
+      const userSession = localStorage.getItem('mock_user_session');
+      if (userSession) {
+        setUser(JSON.parse(userSession));
+      }
+
       setIsLoading(false);
     };
-    checkSession();
+    restoreSessions();
   }, []);
 
-  const login = async (email: string, pass: string): Promise<boolean> => {
-    // Simulate POST /api/admin/login
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Validate credentials (mocking server-side hash check)
-    if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD_MOCK_HASH) {
-      const userObj: User = { email: ADMIN_EMAIL, role: 'admin' };
-      setUser(userObj);
-      // Create "session"
-      localStorage.setItem('mock_session_id', 'valid_session_token');
+  // --- Normal User Actions ---
+  const loginUser = async (email: string, pass: string): Promise<boolean> => {
+    const foundUser = await api.users.checkCredentials(email, pass);
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem('mock_user_session', JSON.stringify(foundUser));
       return true;
     }
     return false;
   };
 
-  const logout = async () => {
-    // Simulate POST /api/admin/logout
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
+  const logoutUser = () => {
     setUser(null);
-    localStorage.removeItem('mock_session_id');
-    setLocation('/admin/login');
+    localStorage.removeItem('mock_user_session');
+    setLocation('/login');
+  };
+
+  // --- Admin Actions ---
+  const loginAdmin = async (email: string, pass: string): Promise<boolean> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD_MOCK_HASH) {
+      const adminObj: AdminUser = { email: ADMIN_EMAIL, role: 'admin' };
+      setAdmin(adminObj);
+      localStorage.setItem('mock_admin_session', 'valid_admin_token');
+      return true;
+    }
+    return false;
+  };
+
+  const logoutAdmin = () => {
+    setAdmin(null);
+    localStorage.removeItem('mock_admin_session');
+    // Redirect to Dashboard (which will check for User session) or User Login
+    setLocation('/'); 
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      admin, 
+      loginUser, 
+      logoutUser, 
+      loginAdmin, 
+      logoutAdmin, 
+      isLoading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

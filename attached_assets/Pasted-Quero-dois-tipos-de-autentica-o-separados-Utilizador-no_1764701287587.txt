@@ -1,0 +1,73 @@
+Quero dois tipos de autenticação separados:
+
+Utilizador normal
+
+Precisa de login para aceder a Dashboard e Calculadora.
+
+Não pode ver nem aceder ao menu ‘Administração’.
+
+As credenciais destes utilizadores são criadas e geridas apenas no painel de administração (por um admin).
+
+Implementar:
+
+Modelo ‘User’ com campos: id, nome, email, passwordHash, ativo.
+
+Rotas:
+
+POST /api/auth/login → login de utilizador normal (cria sessão user).
+
+POST /api/auth/logout → termina sessão user.
+
+GET /api/auth/me → devolve dados do utilizador logado ou 401.
+
+Middleware ‘requireUser’:
+
+Protege páginas/rotas Dashboard e Calculadora (se não houver user em sessão → redirecionar para página de login de utilizador normal).
+
+Administrador
+
+Login de admin totalmente separado do login de utilizador normal.
+
+Ecrã ‘Acesso Reservado’ só aparece quando o utilizador clica no botão ‘Administração’ ou acede a uma rota /admin.
+
+Implementar:
+
+Utilizador admin fixo (email em .env, password em hash).
+
+Rotas:
+
+POST /api/admin/login, /api/admin/logout, GET /api/admin/me, usando sessão admin própria.
+
+Middleware ‘requireAdmin’:
+
+Só aplicado às rotas /admin/** e APIs usadas pelo painel de administração.
+
+Após admin logout:
+
+Redirecionar fora da área /admin (por exemplo para o Dashboard ou página de login de utilizador normal).
+
+NÃO mostrar ecrã ‘Acesso Reservado’ a menos que volte a clicar em ‘Administração’.
+
+Gestão de utilizadores normais no painel de administração
+
+Dentro do menu ‘Administração’, criar uma secção “Utilizadores” onde o admin pode:
+
+Criar conta de utilizador normal (nome, email, password inicial).
+
+Ativar/desativar contas.
+
+Estes utilizadores:
+
+Fazem login só através da página de login de utilizador normal.
+
+Nunca têm acesso ao menu ‘Administração’ (não renderizar esse item para quem não é admin).
+
+Não alterar
+
+Lógica de cálculo de silenciadores e preços.
+
+Layout e funcionamento das páginas já existentes, exceto o mínimo necessário para:
+
+Mostrar login de utilizador normal antes de Dashboard/Calculadora.
+
+Mostrar login de admin apenas ao entrar em ‘Administração’.

@@ -57,6 +57,5 @@ export const mockPrecosBaffle: PrecoUnitarioBaffle[] = [
 ];
 
 export const mockUsers: User[] = [
-  { id: 1, username: "admin", role: "admin" },
-  { id: 2, username: "eng_civil", role: "user" },
+  { id: 1, name: "Engenheiro Civil", email: "user@france-air.com", role: "user", active: true, passwordHash: "User123!" },
 ];

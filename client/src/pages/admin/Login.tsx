@@ -7,25 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
-// Removed Layout import to have a standalone login page
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login, user } = useAuth();
+  const { loginAdmin, admin } = useAuth();
   const [_, setLocation] = useLocation();
 
-  // If already logged in, redirect
-  if (user?.role === 'admin') {
-    setLocation('/admin'); // Redirect to Admin Panel
+  // If already logged in as admin, redirect to Admin Panel
+  if (admin) {
+    setLocation('/admin'); 
     return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const success = await login(email, password);
+    const success = await loginAdmin(email, password);
     if (success) {
       setLocation('/admin'); // Redirect to Admin Panel
     } else {
@@ -34,34 +33,35 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+      <Card className="w-full max-w-md shadow-2xl border-slate-800 bg-slate-900 text-slate-100">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary/10 rounded-full">
-              <Lock className="w-6 h-6 text-primary" />
+            <div className="p-3 bg-red-500/10 rounded-full">
+              <Lock className="w-6 h-6 text-red-500" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Acesso Reservado</CardTitle>
-          <CardDescription className="text-center">
-            Introduza as suas credenciais de administrador.
+          <CardTitle className="text-2xl text-center">Administração</CardTitle>
+          <CardDescription className="text-center text-slate-400">
+            Acesso reservado a administradores.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-slate-300">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="admin@example.com"
+                placeholder="admin@france-air.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-slate-950 border-slate-800 text-slate-100 focus-visible:ring-red-500/50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-slate-300">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -69,14 +69,28 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-slate-950 border-slate-800 text-slate-100 focus-visible:ring-red-500/50"
               />
             </div>
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="bg-red-900/20 border-red-900 text-red-300">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full">Entrar</Button>
+            <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white">
+              Entrar no Painel
+            </Button>
+            
+            <div className="pt-4 text-center">
+              <Button 
+                variant="link" 
+                className="text-slate-500 hover:text-slate-400 text-sm"
+                onClick={() => setLocation('/')}
+                type="button"
+              >
+                ← Voltar ao Site
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

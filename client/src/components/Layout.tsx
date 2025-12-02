@@ -3,12 +3,12 @@ import {
   LayoutDashboard, 
   Calculator, 
   Settings, 
-  Users, 
   Menu, 
   X, 
   Activity,
-  Database,
-  LogOut
+  LogOut,
+  User as UserIcon,
+  ShieldCheck
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { api } from "../api/mockApi";
@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [healthStatus, setHealthStatus] = useState<"ok" | "error" | "loading">("loading");
-  const { logout } = useAuth();
+  const { user, admin, logoutUser, logoutAdmin } = useAuth();
 
   useEffect(() => {
     api.health()
@@ -28,10 +28,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       .catch(() => setHealthStatus("error"));
   }, []);
 
+  const isAdminPage = location.startsWith('/admin');
+  const currentUser = isAdminPage ? admin : user;
+  const logoutAction = isAdminPage ? logoutAdmin : logoutUser;
+
   const navItems = [
-    { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/calculator", icon: Calculator, label: "Calculadora" }, 
-    { href: "/admin", icon: Settings, label: "Administração" },
+    { href: "/", icon: LayoutDashboard, label: "Dashboard", show: !isAdminPage }, // Only show on User Dashboard
+    { href: "/calculator", icon: Calculator, label: "Calculadora", show: !isAdminPage }, // Only show on User Dashboard
+    { href: "/admin", icon: Settings, label: "Administração", show: true }, // Always show (triggers admin login if needed)
   ];
 
   return (
@@ -68,8 +72,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="p-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = location === item.href;
+          {navItems.filter(i => i.show).map((item) => {
+            // Logic: If I am a normal user, I should NOT see "Administração" button in the menu?
+            // Prompt says: "Utilizador normal... Não pode ver nem aceder ao menu ‘Administração’ (não renderizar esse item para quem não é admin)"
+            // But also: "Ecrã ‘Acesso Reservado’ só aparece quando o utilizador clica no botão ‘Administração’"
+            // Conflict resolution: I will show it ONLY if admin is logged in OR if we are not in user-only mode?
+            // Actually, let's follow "Não pode ver nem aceder". If user is logged in and NOT admin, hide it.
+            if (item.href === '/admin' && !admin) return null;
+            
+            const isActive = location === item.href || (item.href !== '/' && location.startsWith(item.href));
             return (
               <Link key={item.href} href={item.href}>
                 <div 
@@ -91,14 +102,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         <div className="absolute bottom-0 left-0 w-full p-4 border-t border-sidebar-border bg-sidebar/50 backdrop-blur-sm">
           <div className="flex items-center gap-3 px-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold">
-              AD
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${isAdminPage ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'} text-xs font-bold`}>
+              {isAdminPage ? <ShieldCheck className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">Admin User</p>
-              <p className="text-xs text-muted-foreground truncate">hneves@rha-technologies.pt</p>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">
+                {isAdminPage ? 'Admin User' : (user?.name || 'Utilizador')}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {isAdminPage ? admin?.email : user?.email}
+              </p>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={logout} title="Terminar Sessão">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={logoutAction} title="Terminar Sessão">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
