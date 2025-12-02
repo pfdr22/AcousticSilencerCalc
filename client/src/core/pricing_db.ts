@@ -11,8 +11,14 @@ export const PRICING_DB = {
     'palete_embalagem_un': 4.5,
   },
   labor: {
-    'mao_obra_caixa_m2': 9.63,
-    'mao_obra_baffles_m2': 8.0,
+    // These keys are kept for compatibility/admin panel but might be ignored by new logic 
+    // if the logic uses hardcoded dynamic formulas as per prompt.
+    // However, since the prompt says "Preços unitários (constantes ou configuráveis...)", 
+    // and then lists dynamic functions separately, I'll leave these here but maybe unused or 
+    // I could map the coefficients to these if possible. 
+    // Given the strict instruction "Substituir 100% da lógica", I will use the formulas.
+    'mao_obra_caixa_m2': 4.5, // Used as factor in formula?
+    'mao_obra_baffles_m2': 8.0, // Unused/Legacy
   },
   factors: {
     'custos_indiretos': 0.35,

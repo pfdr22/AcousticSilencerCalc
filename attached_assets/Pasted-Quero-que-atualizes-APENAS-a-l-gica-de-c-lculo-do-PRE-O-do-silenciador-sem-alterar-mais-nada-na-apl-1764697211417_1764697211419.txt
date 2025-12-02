@@ -1,0 +1,145 @@
+Quero que atualizes APENAS a lógica de cálculo do PREÇO do silenciador, sem alterar mais nada na aplicação (UI, formulários, cálculos acústicos, base de dados, autenticação, etc.).​
+
+Regras de segurança:
+
+NÃO criar nem apagar ficheiros fora dos módulos/funções onde hoje já é calculado o preço do silenciador.
+
+NÃO alterar componentes de interface, textos, estilos ou layouts.
+
+NÃO mexer em lógica de recolha de dados de entrada (largura, altura, profundidade, nº de baffles, espessura das baffles) – esses campos já existem e devem continuar iguais.
+
+Mantém exatamente os mesmos nomes de campos de entrada e a mesma API de saída (onde hoje se devolve o preço final).
+
+Objetivo:
+
+Substituir 100% da lógica anterior de cálculo de preço por uma nova lógica baseada em duas parcelas:
+
+Preço BAFFLES (Cálculo Atenuador BAFFLE).
+
+Preço CAIXA (Cálculo CAIXA).
+
+O preço final do silenciador é: Preço_Final = Preço_BAFFLES + Preço_CAIXA.
+
+Mapeamento dos dados de entrada para as fórmulas:
+
+LARGURA → LARGURA (mm)
+
+ALTURA → ALTURA (mm)
+
+PROFUNDIDADE → PROFUNDIDADE (mm)
+
+NÚMERO DE BAFFLES → N.º BAFFLES
+
+ESPESSURA DAS BAFFLES → ESPESSURA BAFFLES (mm)
+
+Preços unitários (constantes ou configuráveis no painel de administrador):
+
+Chapa 0.8mm (m²): 7,5
+
+Chapa 0.6mm (m²): 5,5
+
+Lã Knauf (m²): 6,5
+
+Lã Knauf s/ película (m²): 4
+
+Perfil P30 (m.l): 1,3
+
+Cantos metálicos (un): 0,15
+
+Rebites (un): 0,02
+
+Palete + Embalagem (un): 4,5
+
+Custos indiretos (%): 0,35
+
+Lucro (%): 0,15
+
+Preços unitários dinâmicos (funções):
+
+Mão de obra caixa (€/m2):
+mo_caixa = ((2PROFUNDIDADE(ALTURA+35) + 2PROFUNDIDADE(LARGURA+35))/1_000_000)4,5 + LARGURAALTURAPROFUNDIDADE/1_000_000_0002
+
+Mão de obra baffles (€/m2):
+mo_baffles = ((ALTURA2+PROFUNDIDADE2)/10001,5)+0,5((ALTURA*PROFUNDIDADE/1_000_000)ESPESSURA_BAFFLES/1002)
+
+Cálculo BAFFLES (Cálculo Atenuador BAFFLE)
+
+Quantidades:
+
+area_ch06_baf = ((2ALTURA(ESPESSURA_BAFFLES+90)+2PROFUNDIDADE(ESPESSURA_BAFFLES+50))/1_000_000 * N_BAFFLES) + (2PROFUNDIDADE100/1_000_000) * (N_BAFFLES se ALTURA>1250 senão 0)
+
+area_la_baf = ALTURA*PROFUNDIDADE/1_000_000 * 2 * N_BAFFLES
+
+area_la_sem_pel_baf = ALTURA*PROFUNDIDADE/1_000_000 * N_BAFFLES * ((ESPESSURA_BAFFLES-100)/50)
+
+qtd_rebites_baf = N_BAFFLES * 12
+
+custo_mo_baffles_baf = mo_baffles * N_BAFFLES
+
+Custos BAFFLES (apenas estes contam):
+
+custo_chapa_06_baf = area_ch06_baf * PU_ch06
+
+custo_la_baf = area_la_baf * PU_la
+
+custo_la_sem_pel_baf = area_la_sem_pel_baf * PU_la_np
+
+custo_rebites_baf = qtd_rebites_baf * PU_rebite
+
+custo_mo_baffles_baf = custo_mo_baffles_baf
+
+Subtotal_BAFFLES = custo_chapa_06_baf + custo_la_baf + custo_la_sem_pel_baf + custo_rebites_baf + custo_mo_baffles_baf
+
+Custos_indiretos_BAFFLES = Subtotal_BAFFLES * CUSTOS_INDIRETOS_PCT
+Lucro_BAFFLES = (Subtotal_BAFFLES + Custos_indiretos_BAFFLES) * LUCRO_PCT
+Preco_BAFFLES = Subtotal_BAFFLES + Custos_indiretos_BAFFLES + Lucro_BAFFLES
+
+Importante: no bloco BAFFLES NÃO entram custos de chapa 0.8, perfil P30, cantos, palete nem mão de obra caixa (ficam a zero).
+
+Cálculo CAIXA
+
+Quantidades:
+
+area_ch08_caixa = ((2PROFUNDIDADE(ALTURA+35) + 2PROFUNDIDADE(LARGURA+35))/1_000_000)
+
+compr_P30_caixa = 4*(LARGURA+ALTURA)/1000
+
+qtd_cantos_caixa = 8
+
+qtd_rebites_caixa = N_BAFFLES * 12
+
+qtd_palete_caixa = 1
+
+custo_mo_caixa = mo_caixa (resultado da fórmula acima)
+
+Custos CAIXA:
+
+custo_chapa_08_caixa = area_ch08_caixa * PU_ch08
+
+custo_P30_caixa = compr_P30_caixa * PU_P30
+
+custo_cantos_caixa = qtd_cantos_caixa * PU_cantos
+
+custo_rebites_caixa = qtd_rebites_caixa * PU_rebite
+
+custo_palete_caixa = qtd_palete_caixa * PU_palete
+
+custo_mo_caixa_caixa = custo_mo_caixa
+
+Subtotal_CAIXA = custo_chapa_08_caixa + custo_P30_caixa + custo_cantos_caixa + custo_rebites_caixa + custo_palete_caixa + custo_mo_caixa_caixa
+
+Custos_indiretos_CAIXA = Subtotal_CAIXA * CUSTOS_INDIRETOS_PCT
+Lucro_CAIXA = (Subtotal_CAIXA + Custos_indiretos_CAIXA) * LUCRO_PCT
+Preco_CAIXA = Subtotal_CAIXA + Custos_indiretos_CAIXA + Lucro_CAIXA
+
+Preço final
+
+Preco_FINAL = Preco_BAFFLES + Preco_CAIXA
+
+Validação obrigatória (não avançar se falhar):
+
+Para L=1200, A=800, P=1000, N_BAFFLES=4, ESP=200 → Preco_FINAL ≈ 288,81 € (aceita diferença máxima de 0,01 € por arredondamentos).
+
+Para L=1200, A=1500, P=1000, N_BAFFLES=3, ESP=300 → Preco_FINAL ≈ 453,20 € (mesma tolerância).
+
+Se algum teste não bater certo, ajusta APENAS esta função de cálculo de preço até coincidir. Não tocar em mais nenhuma parte do projeto
