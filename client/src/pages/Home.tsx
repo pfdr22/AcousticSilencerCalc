@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Activity, Database, FileText, Calculator } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Home() {
   return (
@@ -22,17 +23,6 @@ export default function Home() {
               <p className="text-xs text-muted-foreground">Todos os serviços online</p>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Projetos Recentes</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">Sem projetos ativos</p>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -44,25 +34,17 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="flex items-center p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer group">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Calculator className="h-5 w-5 text-primary" />
+              <Link href="/calculator">
+                <div className="flex items-center p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer group">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Calculator className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium leading-none">Novo Cálculo</p>
+                    <p className="text-sm text-muted-foreground mt-1">Iniciar dimensionamento de silenciador</p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium leading-none">Novo Cálculo</p>
-                  <p className="text-sm text-muted-foreground mt-1">Iniciar dimensionamento de silenciador</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer group">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Database className="h-5 w-5 text-primary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium leading-none">Base de Dados</p>
-                  <p className="text-sm text-muted-foreground mt-1">Consultar tabelas de referência</p>
-                </div>
-              </div>
+              </Link>
             </CardContent>
           </Card>
 
