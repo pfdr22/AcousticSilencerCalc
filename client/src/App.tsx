@@ -38,18 +38,14 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function Router() {
   return (
     <Switch>
-      {/* Public Route: Login */}
+      {/* Public Routes */}
       <Route path="/admin/login" component={Login} />
+      <Route path="/" component={Home} />
+      <Route path="/calculator" component={Calculator} />
       
-      {/* Protected Routes */}
-      <Route path="/">
-        <ProtectedRoute component={Home} />
-      </Route>
+      {/* Protected Admin Route */}
       <Route path="/admin">
         <ProtectedRoute component={Admin} />
-      </Route>
-      <Route path="/calculator">
-        <ProtectedRoute component={Calculator} />
       </Route>
 
       <Route component={NotFound} />

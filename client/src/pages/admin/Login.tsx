@@ -18,7 +18,7 @@ export default function Login() {
 
   // If already logged in, redirect
   if (user?.role === 'admin') {
-    setLocation('/'); // Redirect to Dashboard (Home)
+    setLocation('/admin'); // Redirect to Admin Panel
     return null;
   }
 
@@ -27,7 +27,7 @@ export default function Login() {
     setError("");
     const success = await login(email, password);
     if (success) {
-      setLocation('/'); // Redirect to Dashboard
+      setLocation('/admin'); // Redirect to Admin Panel
     } else {
       setError("Email ou password incorretos.");
     }
