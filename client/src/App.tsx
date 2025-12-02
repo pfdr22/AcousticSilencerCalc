@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,16 +8,50 @@ import Home from "@/pages/Home";
 import Admin from "@/pages/Admin";
 import Login from "@/pages/admin/Login";
 import Calculator from "@/pages/Calculator";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataContext";
+import { Loader2 } from "lucide-react";
+
+// Protected Route Wrapper
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { user, isLoading } = useAuth();
+  const [_, setLocation] = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    // Redirect to login if not authenticated
+    // Use a timeout to avoid rendering conflicts during state updates
+    setTimeout(() => setLocation('/admin/login'), 0);
+    return null;
+  }
+
+  return <Component />;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/admin" component={Admin} />
+      {/* Public Route: Login */}
       <Route path="/admin/login" component={Login} />
-      <Route path="/calculator" component={Calculator} />
+      
+      {/* Protected Routes */}
+      <Route path="/">
+        <ProtectedRoute component={Home} />
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute component={Admin} />
+      </Route>
+      <Route path="/calculator">
+        <ProtectedRoute component={Calculator} />
+      </Route>
+
       <Route component={NotFound} />
     </Switch>
   );

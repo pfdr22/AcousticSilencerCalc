@@ -1,0 +1,141 @@
+Quero adicionar autenticação de ADMIN ao painel de administrador desta aplicação, sem alterar a lógica de cálculo, UI de resultados ou estrutura existente.
+
+Regras gerais:
+
+NÃO modificar a lógica de cálculo de silenciadores, nem o painel de cálculo.
+
+NÃO alterar textos, layout ou estilos existentes, exceto o estritamente necessário para mostrar o formulário de login e o botão de logout.
+
+Toda a lógica nova deve ser limitada ao fluxo de autenticação (login, sessão, logout) e proteção das rotas do painel de admin.
+
+Objetivo:
+
+Implementar um sistema simples de login/logout para o utilizador ‘Admin User’ que aparece no painel (admin@france-air.com).
+
+Apenas quem estiver autenticado pode ver/aceder ao Dashboard, Base de Dados e restantes ecrãs do administrador.
+
+Utilizar sessões em servidor (cookies de sessão), não JWT no browser.
+
+Funcionalidades a implementar:
+
+Modelo/configuração de utilizador admin
+
+Definir um utilizador ADMIN fixo, com:
+
+email: admin@france-air.com
+
+password: define uma password segura (por agora algo como ‘Admin123!’), mas deixa isto facilmente configurável num .env.
+
+Guardar a password apenas como hash (ex.: bcrypt). Não guardar password em claro.
+
+Rotas de API
+
+Criar rota POST /api/admin/login:
+
+Recebe { email, password } no body.
+
+Valida credenciais comparando com o utilizador admin (hash).
+
+Se correto: cria sessão de admin (por exemplo, req.session.user = { role: 'admin', email: 'admin@france-air.com' } ) e devolve 200.
+
+Se errado: devolve 401 com mensagem genérica (“Credenciais inválidas”).
+
+Criar rota POST /api/admin/logout:
+
+Destrói a sessão (req.session.destroy ou equivalente).
+
+Devolve 200.
+
+Criar rota GET /api/admin/me (opcional mas útil):
+
+Se existir sessão válida de admin, devolve dados mínimos (email, role).
+
+Se não existir, devolve 401.
+
+Gestão de sessão
+
+Usar sessão baseada em cookie (ex.: express-session ou mecanismo equivalente do framework que o projeto já usa).
+
+Cookie com:
+
+httpOnly: true
+
+secure: true (se estiver em HTTPS)
+
+SameSite: 'lax' ou 'strict'
+
+Tempo de expiração razoável (ex.: 30–60 minutos de inatividade).
+
+UI de Login
+
+Criar um ecrã/página de login de administrador com:
+
+Campo email
+
+Campo password (type=password)
+
+Botão “Entrar”
+
+Este ecrã deve ser mostrado:
+
+Quando o utilizador acede à aplicação pela primeira vez sem sessão.
+
+Quando uma chamada a /api/admin/me indicar que não há sessão.
+
+Ao submeter:
+
+Chamar POST /api/admin/login.
+
+Se sucesso: guardar estado “autenticado” no frontend e redirecionar para o Dashboard atual.
+
+Se erro: mostrar mensagem simples de erro (“Email ou password incorretos.”).
+
+Botão de Logout no menu lateral
+
+No menu lateral onde aparece “Admin User”:
+
+Adicionar um pequeno botão ou opção “Terminar sessão / Logout”.
+
+Ao clicar:
+
+Chamar POST /api/admin/logout.
+
+Limpar estado de autenticação no frontend.
+
+Redirecionar para a página de login.
+
+Não alterar o restante layout do menu; só acrescentar essa ação.
+
+Proteção de rotas do painel
+
+No backend:
+
+Criar middleware que verifica se req.session.user existe e tem role 'admin'.
+
+Aplicar esse middleware às rotas relacionadas com o painel de administrador (dashboard, base de dados, etc.).
+
+No frontend:
+
+Ao montar páginas do painel, chamar /api/admin/me.
+
+Se 401: redirecionar automaticamente para o ecrã de login.
+
+Não alterar:
+
+Lógica de cálculo de preços ou atenuação.
+
+Estrutura de dados dos cálculos.
+
+Layout dos ecrãs de resultados.
+
+Tabelas de preços e demais funcionalidades já implementadas.
+
+No final:
+
+Confirmar que:
+
+Sem login não é possível aceder ao Dashboard nem calcular silenciadores (redireciona para login).
+
+Com login válido, tudo funciona exatamente como hoje.
+
+Ao fazer logout, volta ao ecrã de login e qualquer tentativa seguinte de aceder ao painel obriga a autenticação novamente.”

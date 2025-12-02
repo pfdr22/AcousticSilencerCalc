@@ -7,17 +7,20 @@ import {
   Menu, 
   X, 
   Activity,
-  Database
+  Database,
+  LogOut
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { api } from "../api/mockApi";
 import { Button } from "@/components/ui/button";
 import logoImage from "@assets/image_1764364708706.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [healthStatus, setHealthStatus] = useState<"ok" | "error" | "loading">("loading");
+  const { logout } = useAuth();
 
   useEffect(() => {
     api.health()
@@ -93,11 +96,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-sm font-medium text-sidebar-foreground truncate">Admin User</p>
-              <p className="text-xs text-muted-foreground truncate">admin@france-air.com</p>
+              <p className="text-xs text-muted-foreground truncate">hneves@rha-technologies.pt</p>
             </div>
-            <div title={`System Status: ${healthStatus}`}>
-              <Activity className={`h-4 w-4 ${healthStatus === 'ok' ? 'text-green-500' : 'text-red-500'}`} />
-            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={logout} title="Terminar Sessão">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </aside>
