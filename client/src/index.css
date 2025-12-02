@@ -345,6 +345,47 @@
   --radius: 0.5rem;
 }
 
+/* Print Monochrome Mode - Forces Black & White for PDF Export */
+.print-monochrome {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.print-monochrome * {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Ensure backgrounds are white to remove any colored tints */
+.print-monochrome [class*="bg-"] {
+  background-color: #ffffff !important;
+}
+
+/* Handle Recharts/SVG elements specifically */
+.print-monochrome path,
+.print-monochrome line,
+.print-monochrome circle {
+  stroke: #000000 !important;
+}
+
+.print-monochrome .recharts-cartesian-grid line {
+  stroke: #e5e5e5 !important; /* Light gray for grid lines */
+}
+
+.print-monochrome .recharts-tooltip-cursor {
+  stroke: #000000 !important;
+}
+
+/* Remove any decorative fills */
+.print-monochrome [class*="fill-"] {
+  fill: #000000 !important;
+}
+
+/* Force transparent backgrounds where needed if white breaks layout, 
+   but generally white is safer for PDF printout */
+
 /* LIGHT MODE - Professional Engineering Clean */
 :root {
   --background: 210 20% 98%; /* Very light cool grey */

@@ -87,6 +87,9 @@ export default function Calculator() {
     const element = resultsRef.current;
     if (!element) return;
 
+    // Add monochrome class for B&W export
+    element.classList.add('print-monochrome');
+
     const opt = {
       margin: 10,
       filename: `Relatório_Silenciador_${new Date().toISOString().slice(0,10)}.pdf`,
@@ -95,7 +98,13 @@ export default function Calculator() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().from(element).set(opt).save();
+    html2pdf().from(element).set(opt).save().then(() => {
+      // Remove class after export
+      element.classList.remove('print-monochrome');
+    }).catch((err: any) => {
+      console.error("PDF Export Error:", err);
+      element.classList.remove('print-monochrome');
+    });
   };
 
   const calculations = useMemo(() => {
