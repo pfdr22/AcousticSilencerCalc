@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed lg:static z-50 top-0 left-0 h-full w-64 
+          fixed z-50 top-0 left-0 h-full w-[260px] shrink-0
           bg-sidebar border-r border-sidebar-border 
           transition-transform duration-200 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -103,7 +103,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0 overflow-hidden lg:ml-[260px]">
         <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
