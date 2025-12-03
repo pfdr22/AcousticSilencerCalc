@@ -383,6 +383,11 @@
   display: none !important;
 }
 
+/* Show logo only in print mode */
+.print-monochrome .pdf-logo {
+  display: block !important;
+}
+
 /* Remove any decorative fills */
 .print-monochrome [class*="fill-"] {
   fill: #000000 !important;

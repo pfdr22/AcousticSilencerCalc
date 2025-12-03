@@ -11,6 +11,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
+import logoImage from "@assets/image_1764754258727.png";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";
@@ -258,7 +259,7 @@ export default function Calculator() {
           <div ref={resultsRef}>
             <Card className="border-0 shadow-none">
               <CardHeader className="px-0 pt-0">
-                <div className="flex justify-between items-center border-b pb-4 mb-4">
+                <div className="flex justify-between items-start border-b pb-4 mb-4">
                   <div>
                     <CardTitle>Relatório de Cálculo</CardTitle>
                     <CardDescription>Data: {new Date().toLocaleDateString('pt-PT')} {new Date().toLocaleTimeString('pt-PT')}</CardDescription>
@@ -266,7 +267,10 @@ export default function Calculator() {
                       Modelo: <span className="font-mono font-bold text-foreground">{calculations.modelName}</span>
                     </p>
                   </div>
-                  {admin && <div className="text-sm text-muted-foreground">Utilizador: Admin</div>}
+                  <div className="flex flex-col items-end gap-2">
+                    <img src={logoImage} alt="France Air Logo" className="h-12 object-contain pdf-logo hidden" />
+                    {admin && <div className="text-sm text-muted-foreground">Utilizador: Admin</div>}
+                  </div>
                 </div>
 
                 {/* INPUT PARAMETERS SECTION FOR PDF */}
