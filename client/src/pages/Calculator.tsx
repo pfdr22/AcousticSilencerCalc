@@ -83,12 +83,17 @@ export default function Calculator() {
   const [finalPriceResult, setFinalPriceResult] = useState<FinalPriceResult | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const handleExportPDF = () => {
+  const handleExportPDF = (withPrice: boolean = true) => {
     const element = resultsRef.current;
     if (!element) return;
 
     // Add monochrome class for B&W export
     element.classList.add('print-monochrome');
+    
+    // Hide price if requested
+    if (!withPrice) {
+      element.classList.add('print-no-price');
+    }
 
     const opt = {
       margin: 10,
@@ -99,11 +104,13 @@ export default function Calculator() {
     };
 
     html2pdf().from(element).set(opt).save().then(() => {
-      // Remove class after export
+      // Remove classes after export
       element.classList.remove('print-monochrome');
+      element.classList.remove('print-no-price');
     }).catch((err: any) => {
       console.error("PDF Export Error:", err);
       element.classList.remove('print-monochrome');
+      element.classList.remove('print-no-price');
     });
   };
 
@@ -492,7 +499,7 @@ export default function Calculator() {
 
                 {/* PREÇO FINAL */}
                 {finalPriceResult && (
-                  <div className="mt-8 break-inside-avoid">
+                  <div className="mt-8 break-inside-avoid price-section">
                      <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                       <div>
                         <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço</h3>
@@ -548,10 +555,14 @@ export default function Calculator() {
             </Card>
           </div>
 
-          <div className="flex justify-end mt-8">
-            <Button onClick={handleExportPDF} className="gap-2" size="lg">
+          <div className="flex justify-end mt-8 gap-4">
+            <Button onClick={() => handleExportPDF(false)} variant="outline" className="gap-2" size="lg">
               <Download className="h-4 w-4" />
-              Exportar em PDF
+              Exportar PDF (sem preços)
+            </Button>
+            <Button onClick={() => handleExportPDF(true)} className="gap-2" size="lg">
+              <Download className="h-4 w-4" />
+              Exportar PDF (com preços)
             </Button>
           </div>
         </div>

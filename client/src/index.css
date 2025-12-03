@@ -378,6 +378,11 @@
   stroke: #000000 !important;
 }
 
+/* Hide price section when requested */
+.print-no-price .price-section {
+  display: none !important;
+}
+
 /* Remove any decorative fills */
 .print-monochrome [class*="fill-"] {
   fill: #000000 !important;
