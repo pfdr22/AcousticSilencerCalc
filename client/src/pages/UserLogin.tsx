@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,12 @@ export default function UserLogin() {
             </Button>
           </form>
           
+          <div className="mt-4 text-center">
+            <Link href="/admin/login" className="text-xs text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+              Área reservada
+            </Link>
+          </div>
+
           <div className="mt-6 text-center text-xs text-slate-400">
             © France Air - Calculadora Acústica
           </div>
