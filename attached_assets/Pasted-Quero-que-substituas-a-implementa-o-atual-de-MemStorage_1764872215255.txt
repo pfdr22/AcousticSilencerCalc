@@ -1,0 +1,73 @@
+Quero que substituas a implementação atual de MemStorage (armazenamento em memória para utilizadores) por uma implementação persistente em base de dados, sem alterar mais nada na aplicação.
+
+Contexto atual:
+
+Existe um ficheiro semelhante a este (ou exatamente este) no backend:
+
+ts
+import { type User, type InsertUser } from "@shared/schema";
+import { randomUUID } from "crypto";
+
+export interface IStorage {
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<string, User>;
+
+  constructor() {
+    this.users = new Map();
+  }
+
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+}
+
+export const storage = new MemStorage();
+Neste momento, os utilizadores só ficam na memória e perdem‑se quando o servidor reinicia.
+
+Objetivo:
+
+Manter exatamente a mesma interface IStorage e a forma como o resto do código usa storage.
+
+Criar uma nova implementação, por exemplo DbStorage, que grave os utilizadores numa base de dados relacional (MySQL/MariaDB ou Postgres, o que fizer mais sentido para o stack atual – usa a mesma tecnologia de BD já usada noutros pontos do projeto, se existir).
+
+Garantir que:
+
+createUser grava o utilizador na BD e devolve o registo completo com id.
+
+getUser e getUserByUsername lêem da BD.
+
+Os tipos User e InsertUser continuam a ser os mesmos de @shared/schema.
+
+No fim, export const storage deve passar a instanciar a nova implementação persistente (new DbStorage(...)) e deixar de usar o MemStorage, mas sem alterar as assinaturas nem os nomes públicos.
+
+Restrições importantes:
+
+Não alteres componentes de UI nem o comportamento do front‑end.
+
+Não alteres outras partes do backend que usam storage (apenas adapta imports se necessário).
+
+Não mudes o formato dos objetos User e InsertUser.
+
+Se precisares de criar migrações ou tabela de utilizadores, fá‑lo apenas na camada de BD já existente (por exemplo Drizzle/Prisma), sem modificar outras tabelas ou lógicas.
+
+Comenta claramente no código novo onde é configurada a ligação à BD e o nome da tabela de utilizadores, para que depois eu possa ajustar as credenciais/URL da BD no ambiente da RHA.
+
+Reforço: o objetivo é apenas trocar o armazenamento de utilizadores de memória para base de dados, preservando a interface IStorage e o resto da aplicação tal como está.
