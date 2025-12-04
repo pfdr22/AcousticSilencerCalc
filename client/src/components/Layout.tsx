@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { api } from "../api/mockApi";
 import { Button } from "@/components/ui/button";
-import logoImage from "@assets/image_1764364708706.png";
+import logoImage from "@assets/FRANCE_AIR_AIRVANCE_Logo_Preto100_4cores_(1)_1764843216985.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

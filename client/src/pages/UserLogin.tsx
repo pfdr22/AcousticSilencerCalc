@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, Building2 } from "lucide-react";
+import logoImage from "@assets/FRANCE_AIR_AIRVANCE_Logo_Preto100_4cores_(1)_1764843216985.jpg";
 
 export default function UserLogin() {
   const [email, setEmail] = useState("");
@@ -37,8 +38,8 @@ export default function UserLogin() {
       <Card className="w-full max-w-md shadow-xl border-slate-200">
         <CardHeader className="space-y-1 pb-6">
           <div className="flex justify-center mb-6">
-            <div className="h-20 w-20 bg-white rounded-full shadow-sm flex items-center justify-center border border-slate-100">
-               <Building2 className="h-10 w-10 text-blue-600" />
+            <div className="h-20 w-auto px-4 bg-white rounded-lg shadow-sm flex items-center justify-center border border-slate-100 overflow-hidden">
+               <img src={logoImage} alt="France Air" className="h-full w-full object-contain" />
             </div>
           </div>
           <CardTitle className="text-2xl text-center font-bold text-slate-800">Bem-vindo</CardTitle>

@@ -11,7 +11,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, ArrowRight, Calculator as CalcIcon, BarChart3, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import silencerDimsImage from "@assets/image_1764355007570.png";
-import logoImage from "@assets/image_1764754258727.png";
+import logoImage from "@assets/FRANCE_AIR_AIRVANCE_Logo_Preto100_4cores_(1)_1764843216985.jpg";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { calcularPerdaCarga, PressureLossResult } from "@/core/pressureLoss";
 import { calcularAtenuacao, AtenuacaoResult } from "@/core/attenuation";

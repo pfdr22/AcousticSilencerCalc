@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
+import logoImage from "@assets/FRANCE_AIR_AIRVANCE_Logo_Preto100_4cores_(1)_1764843216985.jpg";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -37,8 +38,8 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-2xl border-slate-800 bg-slate-900 text-slate-100">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-red-500/10 rounded-full">
-              <Lock className="w-6 h-6 text-red-500" />
+            <div className="p-3 bg-white rounded-lg h-20 w-auto flex items-center justify-center overflow-hidden">
+              <img src={logoImage} alt="France Air" className="h-full w-full object-contain" />
             </div>
           </div>
           <CardTitle className="text-2xl text-center">Administração</CardTitle>
