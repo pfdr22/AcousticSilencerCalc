@@ -417,9 +417,9 @@ export default function Admin() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings2 className="w-5 h-5" />
-                  Coeficientes de Multiplicação (Venda)
+                  Coeficientes de Multiplicação (Tabela)
                 </CardTitle>
-                <CardDescription>Ajuste os multiplicadores para o preço de custo e preço de venda final.</CardDescription>
+                <CardDescription>Ajuste os multiplicadores para o preço de custo e preço de tabela final.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -440,7 +440,7 @@ export default function Admin() {
                     <p className="text-xs text-muted-foreground">Multiplicador aplicado ao preço base para obter o custo.</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="coefVenda">Coeficiente de Venda (Ex: 2.353)</Label>
+                    <Label htmlFor="coefVenda">Coeficiente de Tabela (Ex: 2.353)</Label>
                     <div className="flex gap-2">
                       <Input 
                         id="coefVenda"
@@ -453,7 +453,7 @@ export default function Admin() {
                         }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">Multiplicador aplicado ao preço de custo para obter a venda.</p>
+                    <p className="text-xs text-muted-foreground">Multiplicador aplicado ao preço de custo para obter o preço de tabela.</p>
                   </div>
                 </div>
                 <div className="flex justify-end">

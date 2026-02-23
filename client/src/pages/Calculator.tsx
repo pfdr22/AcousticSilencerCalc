@@ -517,7 +517,7 @@ export default function Calculator() {
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
-                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
+                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de Tabela:</strong></span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
                           <strong>{(() => {
                             const coefCusto = parseFloat(localStorage.getItem('coefCusto') || '1.05');
