@@ -510,13 +510,13 @@ export default function Calculator() {
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de custo:</strong></span>
                         <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                          <strong>{(finalPriceResult.preco_final * 1.05).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
+                          <strong>{(finalPriceResult.preco_final * data.pricing.factors.coef_custo).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          <strong>{(Number((finalPriceResult.preco_final * 1.05).toFixed(2)) * 2.353).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
+                          <strong>{(Number((finalPriceResult.preco_final * data.pricing.factors.coef_custo).toFixed(2)) * data.pricing.factors.coef_venda).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
                         </span>
                       </div>
                     </div>

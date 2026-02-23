@@ -96,7 +96,9 @@ export default function Admin() {
       'mao_obra_caixa_m2': 'Mão de obra caixa (€/m²)',
       'mao_obra_baffles_m2': 'Mão de obra baffles (€/m²)',
       'custos_indiretos': 'Custos indiretos (Ex: 0.35)',
-      'lucro': 'Lucro (Ex: 0.15)'
+      'lucro': 'Lucro (Ex: 0.15)',
+      'coef_custo': 'Coeficiente Custo (Ex: 1.05)',
+      'coef_venda': 'Coeficiente Venda (Ex: 2.353)'
     };
     return labels[key] || key.replace(/_/g, ' ');
   };
