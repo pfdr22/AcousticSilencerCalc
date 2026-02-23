@@ -12,9 +12,5 @@ export const APP_CONFIG = {
   },
   LIMITS: {
     MAX_VELOCITY: 20,
-  },
-  COEFFICIENTS: {
-    COST: 1.05,
-    SALE: 2.353
   }
 };

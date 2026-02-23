@@ -16,9 +16,7 @@ export const PRICING_DB = {
   },
   factors: {
     'custos_indiretos': 0.40,
-    'lucro': 0.20,
-    'coef_custo': 1.05,
-    'coef_venda': 2.353
+    'lucro': 0.20
   }
 };
 
