@@ -99,7 +99,7 @@ export default function Calculator() {
     const opt = {
       margin: 10,
       filename: `Relatório_Silenciador_${new Date().toISOString().slice(0,10)}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 0.98 } as any,
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -506,25 +506,25 @@ export default function Calculator() {
                   <div className="mt-8 break-inside-avoid price-section">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
-                        <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de custo</span>
+                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de custo:</strong></span>
                         <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                          {((finalPriceResult.preco_final * 1.05)).toFixed(2)} €
+                          €{(finalPriceResult.preco_final * 1.05).toFixed(2)}
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
-                        <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de venda</span>
+                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          {((finalPriceResult.preco_final * 1.05) * 2.353).toFixed(2)} €
+                          €{(Number((finalPriceResult.preco_final * 1.05).toFixed(2)) * 2.353).toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                       <div>
-                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Base (Referência)</h3>
+                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400"><strong>Preço base (Referência):</strong></h3>
                       </div>
                       <div className="text-5xl font-bold text-green-700 dark:text-green-400">
-                        {finalPriceResult.preco_final.toFixed(2)} €
+                        €{finalPriceResult.preco_final.toFixed(2)}
                       </div>
                     </div>
 
