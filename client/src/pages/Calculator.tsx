@@ -67,6 +67,13 @@ const getBaffleCountLetter = (n: number): string => {
 export default function Calculator() {
   const { data } = useData(); // Get global data
   const { admin } = useAuth(); // Get admin status
+
+  // Ensure localStorage defaults on load for production sync
+  useEffect(() => {
+    if (!localStorage.getItem('coefCusto')) localStorage.setItem('coefCusto', '1.05');
+    if (!localStorage.getItem('coefVenda')) localStorage.setItem('coefVenda', '2.353');
+  }, []);
+
   const [formState, setFormState] = useState<CalculatorState>({
     largura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.WIDTH,
     altura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.HEIGHT,
