@@ -510,13 +510,21 @@ export default function Calculator() {
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de custo:</strong></span>
                         <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                          <strong>{(finalPriceResult.preco_final * 1.05).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
+                          <strong>{(() => {
+                            const coefCusto = parseFloat(localStorage.getItem('coefCusto') || '1.05');
+                            return (finalPriceResult.preco_final * coefCusto).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+                          })()}</strong>
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          <strong>{(Number((finalPriceResult.preco_final * 1.05).toFixed(2)) * 2.353).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
+                          <strong>{(() => {
+                            const coefCusto = parseFloat(localStorage.getItem('coefCusto') || '1.05');
+                            const coefVenda = parseFloat(localStorage.getItem('coefVenda') || '2.353');
+                            const precoCusto = finalPriceResult.preco_final * coefCusto;
+                            return (precoCusto * coefVenda).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+                          })()}</strong>
                         </span>
                       </div>
                     </div>

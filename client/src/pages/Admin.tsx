@@ -124,6 +124,7 @@ export default function Admin() {
             <TabsTrigger value="precos">Preços Unitários</TabsTrigger>
             <TabsTrigger value="atenuacao">Atenuação (Ref)</TabsTrigger>
             <TabsTrigger value="constantes">Constantes de Cálculo</TabsTrigger>
+            <TabsTrigger value="coeficientes">Coeficientes de Venda</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
@@ -407,6 +408,59 @@ export default function Admin() {
                       onChange={(e) => updateConstant('pressure_loss', 'aerodynamic_factor', Number(e.target.value))}
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="coeficientes">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings2 className="w-5 h-5" />
+                  Coeficientes de Multiplicação (Venda)
+                </CardTitle>
+                <CardDescription>Ajuste os multiplicadores para o preço de custo e preço de venda final.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="coefCusto">Coeficiente de Custo (Ex: 1.05)</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="coefCusto"
+                        type="number" 
+                        step="0.001"
+                        defaultValue={localStorage.getItem('coefCusto') || '1.05'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) localStorage.setItem('coefCusto', val);
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Multiplicador aplicado ao preço base para obter o custo.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="coefVenda">Coeficiente de Venda (Ex: 2.353)</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="coefVenda"
+                        type="number" 
+                        step="0.001"
+                        defaultValue={localStorage.getItem('coefVenda') || '2.353'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val) localStorage.setItem('coefVenda', val);
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Multiplicador aplicado ao preço de custo para obter a venda.</p>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                   <Button onClick={() => window.location.reload()} className="gap-2">
+                     <Save className="w-4 h-4" />
+                     Guardar e Aplicar
+                   </Button>
                 </div>
               </CardContent>
             </Card>
