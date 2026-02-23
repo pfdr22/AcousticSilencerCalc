@@ -519,14 +519,6 @@ export default function Calculator() {
                       </div>
                     </div>
 
-                    <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-green-800 dark:text-green-300 uppercase font-bold tracking-wider mb-1">Preço Final</span>
-                        <div className="text-5xl font-black text-green-700 dark:text-green-400">
-                          {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
-                        </div>
-                      </div>
-                    </div>
 
                     {admin && (
                       <Accordion type="single" collapsible className="w-full mt-4">
