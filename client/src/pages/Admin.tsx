@@ -95,8 +95,8 @@ export default function Admin() {
       'palete_embalagem_un': 'Palete + Embalagem (un)',
       'mao_obra_caixa_m2': 'Mão de obra caixa (€/m²)',
       'mao_obra_baffles_m2': 'Mão de obra baffles (€/m²)',
-      'custos_indiretos': 'Custos indiretos (%)',
-      'lucro': 'Lucro (%)'
+      'custos_indiretos': 'Custos indiretos (Ex: 0.35)',
+      'lucro': 'Lucro (Ex: 0.15)'
     };
     return labels[key] || key.replace(/_/g, ' ');
   };
