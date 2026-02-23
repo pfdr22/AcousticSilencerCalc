@@ -524,7 +524,7 @@ export default function Calculator() {
                         <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Base (Referência)</h3>
                       </div>
                       <div className="text-5xl font-bold text-green-700 dark:text-green-400">
-                        {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
+                        {finalPriceResult.preco_final.toFixed(2)} €
                       </div>
                     </div>
 
