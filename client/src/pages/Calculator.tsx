@@ -508,23 +508,23 @@ export default function Calculator() {
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de custo:</strong></span>
                         <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                          €{(finalPriceResult.preco_final * 1.05).toFixed(2)}
+                          <strong>{(finalPriceResult.preco_final * 1.05).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          €{(Number((finalPriceResult.preco_final * 1.05).toFixed(2)) * 2.353).toFixed(2)}
+                          <strong>{(Number((finalPriceResult.preco_final * 1.05).toFixed(2)) * 2.353).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</strong>
                         </span>
                       </div>
                     </div>
 
                     <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                       <div>
-                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400"><strong>Preço base (Referência):</strong></h3>
+                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Base (Referência):</h3>
                       </div>
-                      <div className="text-5xl font-bold text-green-700 dark:text-green-400">
-                        €{finalPriceResult.preco_final.toFixed(2)}
+                      <div className="text-5xl font-black text-green-700 dark:text-green-400">
+                        {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
                       </div>
                     </div>
 
@@ -532,35 +532,39 @@ export default function Calculator() {
                       <Accordion type="single" collapsible className="w-full mt-4">
                         <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
                           <AccordionTrigger className="hover:no-underline py-3">
-                            <span className="text-sm font-medium text-muted-foreground">Ver detalhe de custos</span>
+                            <span className="text-sm font-semibold text-muted-foreground">Ver detalhe de custos (Admin)</span>
                           </AccordionTrigger>
                           <AccordionContent className="pb-4 pt-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
                               <div className="space-y-2">
-                                <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
+                                <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
-                                  <span className="font-mono">{finalPriceResult.custo_caixa.subtotal.toFixed(2)} €</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custo_caixa.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
-                                  <span className="font-mono">{finalPriceResult.custo_baffles.subtotal.toFixed(2)} €</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custo_baffles.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
-                                <div className="flex justify-between font-medium pt-1 border-t">
+                                <div className="flex justify-between font-bold pt-1 border-t text-orange-600">
                                   <span>Subtotal Direto:</span>
-                                  <span className="font-mono">{finalPriceResult.subtotal_direto.toFixed(2)} €</span>
+                                  <span className="font-mono">{finalPriceResult.subtotal_direto.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
                               </div>
                               
                               <div className="space-y-2">
-                                <h4 className="font-semibold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
+                                <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground">Custos Indiretos:</span>
-                                  <span className="font-mono">{finalPriceResult.custos_indiretos_valor.toFixed(2)} €</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custos_indiretos_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground">Margem de Lucro:</span>
-                                  <span className="font-mono">{finalPriceResult.margem_lucro_valor.toFixed(2)} €</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.margem_lucro_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                                </div>
+                                <div className="flex justify-between font-bold pt-1 border-t text-green-600">
+                                  <span>Total Adicional:</span>
+                                  <span className="font-mono">{(finalPriceResult.custos_indiretos_valor + finalPriceResult.margem_lucro_valor).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
                               </div>
                             </div>
