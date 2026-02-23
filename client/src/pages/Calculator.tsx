@@ -504,9 +504,24 @@ export default function Calculator() {
                 {/* PREÇO FINAL */}
                 {finalPriceResult && (
                   <div className="mt-8 break-inside-avoid price-section">
-                     <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+                        <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de custo</span>
+                        <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
+                          {(finalPriceResult.preco_final * 1.05).toFixed(2)} €
+                        </span>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+                        <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de venda</span>
+                        <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
+                          {(finalPriceResult.preco_final * 1.05 * 2.353).toFixed(2)} €
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                       <div>
-                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço</h3>
+                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Base (Referência)</h3>
                       </div>
                       <div className="text-5xl font-bold text-green-700 dark:text-green-400">
                         {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
