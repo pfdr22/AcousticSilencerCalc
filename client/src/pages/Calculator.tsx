@@ -24,6 +24,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
+import { APP_CONFIG } from "@/core/config";
+
 // Types
 type Thickness = 100 | 200 | 300;
 type NoiseMode = 'LW' | 'LWA';
@@ -66,11 +68,11 @@ export default function Calculator() {
   const { data } = useData(); // Get global data
   const { admin } = useAuth(); // Get admin status
   const [formState, setFormState] = useState<CalculatorState>({
-    largura_mm: 1200,
-    altura_mm: 800,
-    profundidade_mm: 1000,
-    espessura_baffles_mm: 200,
-    numero_baffles: 4,
+    largura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.WIDTH,
+    altura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.HEIGHT,
+    profundidade_mm: APP_CONFIG.DEFAULT_DIMENSIONS.DEPTH,
+    espessura_baffles_mm: APP_CONFIG.DEFAULT_DIMENSIONS.BAFFLE_THICKNESS as Thickness,
+    numero_baffles: APP_CONFIG.DEFAULT_DIMENSIONS.BAFFLE_COUNT,
     caudal_m3_h: 5000,
     ruido_montante: {},
     noiseMode: 'LW'
@@ -125,7 +127,7 @@ export default function Calculator() {
     const area_livre_m2 = (largura_m - (numero_baffles * espessura_m)) * altura_m;
     const velocidade_ms = area_livre_m2 > 0 ? (caudal_m3_h / 3600) / area_livre_m2 : 0;
 
-    const isValidVelocity = velocidade_ms <= 20;
+    const isValidVelocity = velocidade_ms <= APP_CONFIG.LIMITS.MAX_VELOCITY;
     const hasError = !isValidVelocity || area_livre_m2 <= 0;
 
     const thicknessCode = getThicknessLetter(espessura_baffles_mm);
