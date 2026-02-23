@@ -508,13 +508,13 @@ export default function Calculator() {
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de custo</span>
                         <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
-                          {(finalPriceResult.preco_final * 1.05).toFixed(2)} €
+                          {((finalPriceResult.preco_final * 1.05)).toFixed(2)} €
                         </span>
                       </div>
                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
                         <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider block mb-1">Preço de venda</span>
                         <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
-                          {(finalPriceResult.preco_final * 1.05 * 2.353).toFixed(2)} €
+                          {((finalPriceResult.preco_final * 1.05) * 2.353).toFixed(2)} €
                         </span>
                       </div>
                     </div>
