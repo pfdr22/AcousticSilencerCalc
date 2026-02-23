@@ -520,9 +520,6 @@ export default function Calculator() {
                     </div>
 
                     <div className="p-6 bg-green-500/10 rounded-xl border border-green-500/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
-                      <div>
-                        <h3 className="font-bold text-xl text-green-700 dark:text-green-400">Preço Base (Referência):</h3>
-                      </div>
                       <div className="text-5xl font-black text-green-700 dark:text-green-400">
                         {finalPriceResult.preco_final.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}
                       </div>
