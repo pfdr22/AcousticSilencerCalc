@@ -31,6 +31,7 @@ type Thickness = 100 | 200 | 300;
 type NoiseMode = 'LW' | 'LWA';
 
 interface CalculatorState {
+  referencia: string;
   largura_mm: number;
   altura_mm: number;
   profundidade_mm: number;
@@ -68,6 +69,7 @@ export default function Calculator() {
   const { data } = useData(); // Get global data
   const { admin } = useAuth(); // Get admin status
   const [formState, setFormState] = useState<CalculatorState>({
+    referencia: "",
     largura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.WIDTH,
     altura_mm: APP_CONFIG.DEFAULT_DIMENSIONS.HEIGHT,
     profundidade_mm: APP_CONFIG.DEFAULT_DIMENSIONS.DEPTH,
@@ -265,6 +267,11 @@ export default function Calculator() {
                   <div>
                     <CardTitle>Relatório de Cálculo</CardTitle>
                     <CardDescription>Data: {new Date().toLocaleDateString('pt-PT')} {new Date().toLocaleTimeString('pt-PT')}</CardDescription>
+                    {formState.referencia && (
+                      <p className="text-sm mt-1 text-primary font-bold">
+                        Referência: {formState.referencia}
+                      </p>
+                    )}
                     <p className="text-sm mt-1">
                       Modelo: <span className="font-mono font-bold text-foreground">{calculations.modelName}</span>
                     </p>
@@ -282,6 +289,14 @@ export default function Calculator() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                      {formState.referencia && (
+                        <div className="col-span-2 md:col-span-4 border-b pb-2 mb-2">
+                          <span className="text-muted-foreground block mb-1">Referência</span>
+                          <span className="font-bold text-primary text-base">
+                            {formState.referencia}
+                          </span>
+                        </div>
+                      )}
                       <div>
                         <span className="text-muted-foreground block mb-1">Dimensões (L x A x P)</span>
                         <span className="font-mono font-medium">
@@ -626,6 +641,15 @@ export default function Calculator() {
                    />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="referencia">Referência</Label>
+                    <Input 
+                      id="referencia" 
+                      placeholder="Ex: Obra XPTO - Piso 1" 
+                      value={formState.referencia} 
+                      onChange={(e) => handleInputChange('referencia', e.target.value)} 
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="largura">Largura (mm) <span className="text-destructive">*</span></Label>
                     <Input id="largura" type="number" value={formState.largura_mm} onChange={(e) => handleInputChange('largura_mm', Number(e.target.value))} />
