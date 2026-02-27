@@ -33,6 +33,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
+    localStorage.removeItem('app_data_v1'); // Clear old cache to force new defaults
     const stored = localStorage.getItem('app_data_v1');
     if (stored) {
       const parsed = JSON.parse(stored);
