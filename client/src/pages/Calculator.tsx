@@ -289,6 +289,14 @@ export default function Calculator() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                      {formState.referencia && (
+                        <div className="col-span-2 md:col-span-4 border-b pb-2 mb-2">
+                          <span className="text-muted-foreground block mb-1">Referência</span>
+                          <span className="font-bold text-primary text-base">
+                            {formState.referencia}
+                          </span>
+                        </div>
+                      )}
                       <div>
                         <span className="text-muted-foreground block mb-1">Dimensões (L x A x P)</span>
                         <span className="font-mono font-medium">
@@ -510,13 +518,22 @@ export default function Calculator() {
                   )}
                 </div>
 
-                {/* PREÇO FINAL - Moved up for PDF layout */}
+                {/* PREÇO FINAL */}
                 {finalPriceResult && (
-                  <div className="mt-4 break-inside-avoid price-section">
-                    <div className="grid grid-cols-1 gap-4 mb-4">
-                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm flex flex-col justify-center">
-                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de Tabela:</strong></span>
-                        <span className="text-3xl font-bold font-mono text-blue-600 dark:text-blue-400">
+                  <div className="mt-8 break-inside-avoid price-section">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de custo:</strong></span>
+                        <span className="text-2xl font-bold font-mono text-slate-700 dark:text-slate-300">
+                          <strong>{(() => {
+                            const coefCusto = parseFloat(localStorage.getItem('coefCusto') || '1.05');
+                            return (finalPriceResult.preco_final * coefCusto).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+                          })()}</strong>
+                        </span>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+                        <span className="text-sm text-muted-foreground block mb-1"><strong>Preço de venda:</strong></span>
+                        <span className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
                           <strong>{(() => {
                             const coefCusto = parseFloat(localStorage.getItem('coefCusto') || '1.05');
                             const coefVenda = parseFloat(localStorage.getItem('coefVenda') || '2.353');
@@ -527,52 +544,50 @@ export default function Calculator() {
                       </div>
                     </div>
 
-                    {/* Cost details hidden in PDF, visible only for Admin in UI */}
+
                     {admin && (
-                      <div className="pdf-hidden">
-                        <Accordion type="single" collapsible className="w-full mt-4">
-                          <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
-                            <AccordionTrigger className="hover:no-underline py-3">
-                              <span className="text-sm font-semibold text-muted-foreground">Ver detalhe de custos (Admin)</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-4 pt-2">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                                <div className="space-y-2">
-                                  <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
-                                  <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
-                                    <span className="font-mono font-bold">{finalPriceResult.custo_caixa.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
-                                    <span className="font-mono font-bold">{finalPriceResult.custo_baffles.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
-                                  <div className="flex justify-between font-bold pt-1 border-t text-orange-600">
-                                    <span>Subtotal Direto:</span>
-                                    <span className="font-mono">{finalPriceResult.subtotal_direto.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
+                      <Accordion type="single" collapsible className="w-full mt-4">
+                        <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
+                          <AccordionTrigger className="hover:no-underline py-3">
+                            <span className="text-sm font-semibold text-muted-foreground">Ver detalhe de custos (Admin)</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-4 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                              <div className="space-y-2">
+                                <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Diretos</h4>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Caixa (Materiais + MO):</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custo_caixa.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
-                                
-                                <div className="space-y-2">
-                                  <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
-                                  <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Custos Indiretos:</span>
-                                    <span className="font-mono font-bold">{finalPriceResult.custos_indiretos_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Margem de Lucro:</span>
-                                    <span className="font-mono font-bold">{finalPriceResult.margem_lucro_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
-                                  <div className="flex justify-between font-bold pt-1 border-t text-green-600">
-                                    <span>Total Adicional:</span>
-                                    <span className="font-mono">{(finalPriceResult.custos_indiretos_valor + finalPriceResult.margem_lucro_valor).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
-                                  </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Baffles (Materiais + MO):</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custo_baffles.subtotal.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                                </div>
+                                <div className="flex justify-between font-bold pt-1 border-t text-orange-600">
+                                  <span>Subtotal Direto:</span>
+                                  <span className="font-mono">{finalPriceResult.subtotal_direto.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
                                 </div>
                               </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-                      </div>
+                              
+                              <div className="space-y-2">
+                                <h4 className="font-bold text-foreground border-b pb-1 mb-2">Custos Indiretos & Margem</h4>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Custos Indiretos:</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.custos_indiretos_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Margem de Lucro:</span>
+                                  <span className="font-mono font-bold">{finalPriceResult.margem_lucro_valor.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                                </div>
+                                <div className="flex justify-between font-bold pt-1 border-t text-green-600">
+                                  <span>Total Adicional:</span>
+                                  <span className="font-mono">{(finalPriceResult.custos_indiretos_valor + finalPriceResult.margem_lucro_valor).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     )}
                   </div>
                 )}
