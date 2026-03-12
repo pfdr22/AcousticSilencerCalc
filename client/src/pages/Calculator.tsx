@@ -490,18 +490,7 @@ export default function Calculator() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 break-inside-avoid">
-                  {/* Atenuação Global */}
-                  <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-primary">Atenuação Global</h3>
-                      <p className="text-sm text-muted-foreground">Soma logarítmica</p>
-                    </div>
-                    <div className="text-4xl font-bold text-primary">
-                      {attenuationResult.global_est} <span className="text-xl font-normal text-muted-foreground">dB</span>
-                    </div>
-                  </div>
-
-                  {/* Perda de Carga */}
+                    {/* Perda de Carga */}
                   {pressureLossResult && (
                     <div className="p-4 bg-orange-500/5 rounded-lg border border-orange-500/20 flex items-center justify-between">
                       <div>
