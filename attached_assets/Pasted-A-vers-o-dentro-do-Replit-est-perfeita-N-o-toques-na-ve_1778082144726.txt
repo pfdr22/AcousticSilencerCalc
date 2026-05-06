@@ -1,0 +1,74 @@
+A versão dentro do Replit está perfeita.
+Não toques na versão de trabalho. Não alteres o componente correto. Não refaças nada.
+
+Problema único
+Na versão publicada/deploy, o print do PDF continua a mostrar uma sobreposição do gráfico antigo preto e branco por cima do gráfico correto.
+
+Quero que corrijas apenas a versão publicada para ela ficar idêntica à versão correta de trabalho.
+
+Instrução principal
+A versão de trabalho dentro do Replit é intocável.
+Só quero mexer no que é necessário para que a versão publicada deixe de servir o gráfico antigo preto e branco.
+
+O que tens de fazer
+Na versão publicada:
+
+remover o gráfico antigo preto e branco do PDF;
+
+manter apenas o gráfico correto atual;
+
+garantir que o output publicado fica igual ao preview correto do Replit;
+
+não tocar em mais nada.
+
+O que NÃO podes fazer
+não mexer no gráfico correto da app de trabalho;
+
+não mexer na composição que já está boa no preview;
+
+não alterar layout geral;
+
+não alterar preços;
+
+não alterar permissões;
+
+não alterar tabelas;
+
+não alterar outros elementos;
+
+não fazer refactor.
+
+Direção técnica
+Trata isto como problema de deploy/snapshot/build/cached artifact.
+
+Verifica especificamente
+se o deploy publicado está a servir uma versão antiga do bundle;
+
+se há cache de deploy que está a manter o gráfico antigo;
+
+se a publicação está a usar um snapshot anterior ao estado atual correto;
+
+se a composição do PDF publicada é diferente da composição usada no preview correto.
+
+Corrige apenas isto
+atualizar/republicar a versão publicada para usar o estado atual correto;
+
+remover o gráfico antigo preto e branco do artefacto publicado;
+
+garantir que a versão publicada replica exatamente o que se vê no Replit.
+
+Regra de segurança
+Se houver qualquer hipótese de mexer no gráfico correto que já está bom no preview, não o faças.
+O preview está certo.
+O deploy é que está errado.
+
+Critério de aceitação
+Só está concluído quando:
+
+o preview do Replit continua perfeito e inalterado;
+
+a versão publicada deixa de mostrar o gráfico antigo preto e branco;
+
+o output publicado fica igual ao preview correto;
+
+nada mais foi alterado.
