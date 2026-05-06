@@ -87,6 +87,7 @@ export default function Calculator() {
   const [downstreamNoiseResult, setDownstreamNoiseResult] = useState<DownstreamNoiseResult | null>(null);
   const [finalPriceResult, setFinalPriceResult] = useState<FinalPriceResult | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const pdfChartRef = useRef<HTMLDivElement>(null);
 
   const handleExportPDF = (withPrice: boolean = true) => {
     const element = resultsRef.current;
@@ -109,7 +110,6 @@ export default function Calculator() {
     };
 
     html2pdf().from(element).set(opt).save().then(() => {
-      // Remove classes after export
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
     }).catch((err: any) => {

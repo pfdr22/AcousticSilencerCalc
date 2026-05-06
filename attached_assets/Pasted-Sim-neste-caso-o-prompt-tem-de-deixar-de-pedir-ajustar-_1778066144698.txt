@@ -1,0 +1,212 @@
+Sim — neste caso o prompt tem de deixar de pedir “ajustar o gráfico” e passar a exigir uma estratégia de exportação diferente e robusta: no PDF, o gráfico deve ser exportado como imagem estática a cores, gerada a partir do gráfico original já com largura e altura fixas, porque Chart.js e fluxos com html2canvas/html2pdf frequentemente precisam de converter o canvas para imagem (toBase64Image() / toDataURL()) e redimensionar antes de inserir no PDF para evitar gráficos pequenos, cortados ou com legendas sobrepostas.
+
+Prompt robusto
+Quero corrigir apenas a exportação do gráfico no PDF da secção Ruído a Jusante (L_down), mantendo o gráfico obrigatoriamente no relatório final.
+
+Requisito obrigatório
+No PDF, o gráfico tem de:
+
+continuar presente;
+
+aparecer a cores;
+
+usar as mesmas cores do software para distinguir as várias linhas;
+
+ficar largo e legível, ocupando corretamente a largura disponível;
+
+ter a legenda legível e sem sobreposição;
+
+continuar por baixo da tabela.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+dados;
+
+valores;
+
+tabela;
+
+layout normal do software;
+
+textos;
+
+preços;
+
+lógica;
+
+qualquer outra secção do relatório.
+
+Problema real a resolver
+O problema atual é que o PDF está a exportar mal o gráfico interativo.
+Mesmo quando a caixa exterior aumenta, o gráfico renderizado continua pequeno, desalinhado e com a legenda comprimida. Portanto, não deves tentar exportar diretamente o chart visível no ecrã tal como está.
+
+Solução obrigatória
+Para o modo PDF, quero que uses esta abordagem:
+
+1. Criar uma versão própria do gráfico para exportação
+Antes de gerar o PDF, cria uma instância dedicada do gráfico apenas para exportação, separada da visualização normal do software.
+
+Essa versão de exportação deve:
+
+usar os mesmos dados;
+
+usar as mesmas cores das linhas existentes no software;
+
+ser renderizada com dimensões fixas adequadas para A4;
+
+ter largura grande e altura proporcional;
+
+ter a legenda no fundo, com espaçamento suficiente.
+
+2. Não usar diretamente o gráfico atual do ecrã
+Não reutilizar o canvas atual tal como está no interface.
+Em vez disso:
+
+criar um canvas temporário próprio para o PDF;
+
+renderizar aí o gráfico no tamanho final correto;
+
+só depois converter esse gráfico para imagem.
+
+3. Converter o gráfico para imagem estática
+Depois de o gráfico de exportação estar renderizado no tamanho certo, convertê-lo para uma imagem estática:
+
+com chart.toBase64Image() ou canvas.toDataURL();
+
+mantendo as cores;
+
+com fundo branco se necessário para evitar transparências estranhas no PDF.
+
+4. Inserir essa imagem no PDF
+No relatório PDF, inserir essa imagem estática do gráfico, já com:
+
+largura correta;
+
+altura correta;
+
+legenda já incorporada na própria imagem;
+
+cores idênticas às do software.
+
+Implementação técnica esperada
+Regras de layout do gráfico de exportação
+A versão de exportação deve ser criada com dimensões fixas, por exemplo:
+
+largura aproximada entre 1000 e 1200 px;
+
+altura entre 320 e 420 px;
+
+resolução suficiente para sair nítida no PDF.
+
+Se estiveres a usar Chart.js
+A configuração do gráfico de exportação deve seguir esta lógica:
+
+js
+const exportChart = new Chart(exportCanvasCtx, {
+  type: 'line',
+  data: sameData,
+  options: {
+    responsive: false,
+    maintainAspectRatio: false,
+    animation: false,
+    devicePixelRatio: 2,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          boxWidth: 12,
+          boxHeight: 12,
+          padding: 24,
+          font: {
+            size: 12
+          }
+        }
+      }
+    },
+    layout: {
+      padding: {
+        top: 10,
+        right: 20,
+        bottom: 10,
+        left: 10
+      }
+    }
+  }
+});
+Isto é importante porque a legenda do Chart.js pode precisar de reposicionamento e ajuste dinâmico quando o gráfico é redimensionado, e a exportação direta do canvas visível tende a herdar dimensões erradas.
+
+Muito importante na sequência
+A sequência correta deve ser:
+
+criar canvas temporário de exportação;
+
+definir largura/altura fixas;
+
+renderizar o gráfico nesse canvas com as mesmas cores e dados;
+
+esperar o render concluir;
+
+converter para imagem base64;
+
+colocar a imagem no bloco do PDF;
+
+gerar o PDF;
+
+remover o canvas temporário.
+
+Não fazer isto
+não aumentar apenas o wrapper;
+
+não exportar o gráfico interativo do ecrã tal como está;
+
+não depender apenas de @media print;
+
+não deixar o PDF capturar um canvas pequeno já renderizado no layout normal.
+
+Requisitos visuais obrigatórios
+No PDF final:
+
+o gráfico deve ocupar praticamente toda a largura útil do seu bloco;
+
+as três linhas devem manter as mesmas cores do software;
+
+a legenda deve mostrar claramente Entrada, Saída e Regenerado;
+
+a legenda não pode ficar sobreposta nem comprimida;
+
+o gráfico deve continuar por baixo da tabela.
+
+Critério de aceitação
+Só está concluído quando:
+
+o gráfico continua presente no PDF;
+
+o gráfico aparece a cores;
+
+as cores das linhas são as mesmas do software;
+
+o gráfico fica largo e legível;
+
+a legenda deixa de ficar sobreposta;
+
+nada mais foi alterado.
+
+Validação final obrigatória
+Antes de concluir:
+
+gerar o PDF com preços e sem preços;
+
+verificar visualmente que o gráfico no PDF já não é o canvas pequeno anterior;
+
+confirmar que o gráfico exportado é uma imagem renderizada ao tamanho final correto;
+
+confirmar que a única alteração foi esta.

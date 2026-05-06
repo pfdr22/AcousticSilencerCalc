@@ -1,0 +1,210 @@
+Perfeito — aqui tens uma versão em inglês técnico, mais robusta e restritiva, para o Replit Agent. O foco é manter o gráfico obrigatoriamente, exportá-lo como imagem estática a cores com as mesmas cores do software, e deixar explícito que não pode mexer em mais nada. Exportar o chart para imagem via toDataURL()/toBase64Image() antes de inserir no PDF é uma abordagem reconhecida para evitar problemas de tamanho, corte e legenda em exportações PDF de gráficos em canvas.
+
+Prompt
+I need a very limited, surgical fix to the PDF export only.
+
+Scope
+This change must apply only to the PDF export output for:
+
+Export PDF (with prices)
+
+Export PDF (without prices)
+
+Mandatory requirement
+The L_down chart must remain in the PDF.
+It is absolutely mandatory to keep the chart.
+
+The chart in the PDF must:
+
+stay below the table;
+
+be in color;
+
+use the exact same line colors as the software UI, so each curve remains visually distinguishable;
+
+be wide and readable;
+
+have a clear, non-overlapping legend;
+
+look correct in the final exported PDF.
+
+Important restriction
+Do not change anything else.
+
+Do not modify:
+
+calculations;
+
+formulas;
+
+values;
+
+data;
+
+table content;
+
+normal screen layout;
+
+UI styling outside PDF export;
+
+texts;
+
+prices;
+
+any other report section;
+
+any business logic.
+
+If something else changes, the task is failed.
+
+Real problem
+The current problem is that the PDF export is not rendering the chart correctly.
+Making the wrapper larger is not enough.
+The chart itself remains small inside the box, which means the exported PDF is still using an incorrectly sized rendered chart instead of a properly sized export version.
+
+Required solution
+Do not export the current on-screen interactive chart as-is.
+
+Instead, for PDF export only, create a dedicated export version of the chart and insert that into the PDF.
+
+Required export strategy
+Create a temporary chart/canvas only for PDF export.
+
+Use the same chart data as the existing chart.
+
+Use the same exact line colors as in the software UI.
+
+Render that export chart at a fixed large size suitable for A4 PDF.
+
+Convert it to an image using chart.toBase64Image() or canvas.toDataURL().
+
+Insert that generated image into the PDF below the table.
+
+Generate the PDF.
+
+Remove the temporary export chart/canvas.
+
+Very important
+Do not rely only on resizing the HTML wrapper.
+Do not use the existing small on-screen chart directly.
+Do not leave the PDF engine to capture the current UI chart automatically.
+
+The PDF must use a separately rendered export chart image at the correct final size.
+
+Technical requirements
+If the chart uses Chart.js, create a dedicated export chart with fixed dimensions, for example:
+
+width: about 1100 px
+
+height: about 360–420 px
+
+white background
+
+animation disabled
+
+legend at the bottom
+
+enough legend padding
+
+maintain the same dataset colors as the app
+
+Example logic:
+
+js
+const exportCanvas = document.createElement('canvas');
+exportCanvas.width = 1100;
+exportCanvas.height = 380;
+
+const exportChart = new Chart(exportCanvas.getContext('2d'), {
+  type: 'line',
+  data: sameChartData,
+  options: {
+    responsive: false,
+    maintainAspectRatio: false,
+    animation: false,
+    devicePixelRatio: 2,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          padding: 24,
+          boxWidth: 12,
+          boxHeight: 12,
+          font: { size: 12 }
+        }
+      }
+    },
+    layout: {
+      padding: {
+        top: 8,
+        right: 16,
+        bottom: 8,
+        left: 8
+      }
+    }
+  }
+});
+Then:
+
+wait until the chart is fully rendered;
+
+export it to base64 image;
+
+place that image in the PDF output.
+
+Color requirement
+The export chart must preserve the same line colors used in the software, because consistency of chart colors between UI and PDF matters for readability and interpretation.
+
+Do not switch to black and white.
+Do not use default fallback colors.
+Do not change the visual color mapping of the series.
+
+Layout requirement
+In the PDF:
+
+table first;
+
+chart second;
+
+chart image centered or full-width within its section;
+
+legend fully readable;
+
+no overlapping labels.
+
+Acceptance criteria
+The task is only complete when:
+
+the chart is still present in the PDF;
+
+the chart is rendered in color;
+
+the chart uses the same colors as the software;
+
+the chart is actually large and readable in the PDF;
+
+the legend does not overlap;
+
+nothing else has changed.
+
+Final validation
+Before marking this as done:
+
+generate both PDFs;
+
+visually verify that the PDF is using a properly rendered export image, not the tiny UI chart;
+
+confirm that the only change is the chart export behavior.
+
+Final instruction
+If necessary, create a dedicated function such as:
+
+buildPdfExportChartImage()
+
+getLDownChartPdfImage()
+
+and use that only during PDF generation.
+
+But again:
+do not modify anything else anywhere in the app.
