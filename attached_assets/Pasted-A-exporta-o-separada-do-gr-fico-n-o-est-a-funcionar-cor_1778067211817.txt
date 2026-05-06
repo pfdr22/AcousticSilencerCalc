@@ -1,0 +1,148 @@
+A exportação separada do gráfico não está a funcionar corretamente no resultado final.
+
+Pela imagem do PDF:
+
+o gráfico continua pequeno;
+
+continua a não ocupar a largura útil disponível;
+
+portanto, mesmo que tenhas criado uma imagem separada, essa imagem está a ser gerada com tamanho errado ou está a ser inserida no PDF com escala errada.
+
+Quero que corrijas apenas isso.
+
+O que tens de fazer
+No fluxo de exportação PDF da secção Ruído a Jusante (L_down), quero que garantas que:
+
+o gráfico é gerado como imagem separada;
+
+essa imagem é criada já com largura e altura finais corretas;
+
+essa imagem é inserida no PDF com largura explícita correta;
+
+o gráfico final no PDF fica grande, largo, legível e a cores;
+
+o gráfico continua por baixo da tabela.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+dados;
+
+tabela;
+
+textos;
+
+layout normal do software;
+
+preços;
+
+outras secções;
+
+qualquer outra funcionalidade.
+
+Problema técnico exato
+O problema já não é “criar imagem separada”.
+O problema é este:
+
+a imagem separada do gráfico está a ser criada ou colocada no PDF com escala/dimensões erradas.
+
+Quero que corrijas isso explicitamente.
+
+Instrução técnica obrigatória
+No PDF, não podes deixar o tamanho final da imagem depender do layout automático.
+
+Tens de definir dimensões explícitas em dois momentos:
+
+1. Na criação da imagem
+A imagem do gráfico tem de ser gerada com um tamanho real grande, por exemplo algo deste género:
+
+largura do canvas de exportação: 1100 a 1300 px
+
+altura do canvas de exportação: 350 a 420 px
+
+2. Na inserção no PDF
+Quando a imagem for colocada no PDF, tens de passar largura explícita de inserção, e não deixar o motor decidir automaticamente.
+
+Por exemplo, se estiveres a usar jsPDF ou equivalente, a imagem deve ser inserida com largura próxima da largura útil da página A4, algo deste género:
+
+js
+pdf.addImage(chartImage, 'PNG', x, y, pdfUsableWidth, chartHeight);
+ou equivalente na biblioteca usada.
+
+Regra crítica
+Não quero:
+
+imagem gerada grande mas inserida pequena;
+
+imagem gerada pequena e depois esticada;
+
+wrapper grande com imagem pequena lá dentro;
+
+escala automática dependente do HTML.
+
+Quero:
+
+imagem do gráfico criada já em tamanho adequado;
+
+imagem inserida no PDF com largura explícita e correta.
+
+Legenda e cores
+O gráfico tem de manter:
+
+as mesmas cores do software;
+
+legenda legível;
+
+linhas claramente diferenciadas;
+
+aparência a cores no PDF.
+
+Não converter para preto e branco.
+Não mudar a paleta de cores existente.
+
+Implementação esperada
+Se necessário:
+
+cria uma função tipo buildLDownPdfChartImage();
+
+faz essa função devolver:
+
+imageData
+
+imageWidth
+
+imageHeight
+
+usa depois esses valores diretamente na inserção da imagem no PDF.
+
+Se já tens isso implementado, então corrige a parte onde essa imagem é colocada no relatório, porque é aí que o resultado continua errado.
+
+Critério de aceitação
+Só está concluído quando:
+
+o gráfico continua presente no PDF;
+
+o gráfico está a cores;
+
+as cores são as mesmas do software;
+
+o gráfico ocupa corretamente a largura útil do relatório;
+
+a legenda fica legível;
+
+nada mais foi alterado.
+
+Validação final obrigatória
+Antes de concluir:
+
+gerar os dois PDFs;
+
+verificar visualmente que o gráfico já não aparece pequeno dentro de uma caixa grande;
+
+confirmar que a única alteração foi o tamanho/escala correta da imagem do gráfico no PDF

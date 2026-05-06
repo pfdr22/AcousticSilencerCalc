@@ -125,8 +125,8 @@ export default function Calculator() {
   const buildLDownPdfChartImage = async () => {
     if (!downstreamNoiseResult) return null;
     const canvas = document.createElement('canvas');
-    canvas.width = 1100;
-    canvas.height = 380;
+    canvas.width = 1280;
+    canvas.height = 420;
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
@@ -135,9 +135,9 @@ export default function Calculator() {
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(70, 30);
-    ctx.lineTo(70, 290);
-    ctx.lineTo(1040, 290);
+    ctx.moveTo(78, 26);
+    ctx.lineTo(78, 282);
+    ctx.lineTo(1196, 282);
     ctx.stroke();
 
     const labels = FREQUENCIES;
@@ -149,18 +149,18 @@ export default function Calculator() {
     const allValues = series.flatMap(s => s.values);
     const minValue = Math.min(...allValues) - 5;
     const maxValue = Math.max(...allValues) + 5;
-    const plotLeft = 80;
-    const plotTop = 25;
-    const plotWidth = 950;
-    const plotHeight = 245;
+    const plotLeft = 88;
+    const plotTop = 24;
+    const plotWidth = 1110;
+    const plotHeight = 250;
     const xStep = plotWidth / (labels.length - 1);
 
-    ctx.font = '11px sans-serif';
+    ctx.font = '12px sans-serif';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'center';
     labels.forEach((label, index) => {
       const x = plotLeft + index * xStep;
-      ctx.fillText(label, x, 315);
+      ctx.fillText(label, x, 320);
     });
 
     ctx.textAlign = 'right';
@@ -168,7 +168,7 @@ export default function Calculator() {
       const value = minValue + ((maxValue - minValue) / 5) * i;
       const y = plotTop + plotHeight - ((value - minValue) / (maxValue - minValue)) * plotHeight;
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText(value.toFixed(0), 62, y + 4);
+      ctx.fillText(value.toFixed(0), 68, y + 4);
       ctx.strokeStyle = '#f1f5f9';
       ctx.beginPath();
       ctx.moveTo(plotLeft, y);
@@ -197,23 +197,23 @@ export default function Calculator() {
       });
     });
 
-    const legendY = 340;
+    const legendY = 356;
     const legendItems = [
       { label: 'Entrada', color: '#94a3b8' },
       { label: 'Saída', color: '#2563eb' },
       { label: 'Regenerado', color: '#f59e0b' },
     ];
-    ctx.font = '12px sans-serif';
+    ctx.font = '13px sans-serif';
     ctx.textAlign = 'left';
     legendItems.forEach((item, index) => {
-      const baseX = 320 + index * 210;
+      const baseX = 340 + index * 230;
       ctx.fillStyle = item.color;
       ctx.fillRect(baseX, legendY - 10, 14, 14);
       ctx.fillStyle = '#0f172a';
       ctx.fillText(item.label, baseX + 22, legendY + 1);
     });
 
-    return canvas.toDataURL('image/png');
+    return { imageData: canvas.toDataURL('image/png'), imageWidth: 190, imageHeight: 62 };
   };
 
   const calculations = useMemo(() => {
