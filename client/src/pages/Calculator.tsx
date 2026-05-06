@@ -460,7 +460,7 @@ export default function Calculator() {
                          
                         <div className="print-chart h-[320px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800 print-chart-wrapper">
                            <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData} margin={{ top: 5, right: 18, bottom: 28, left: 0 }}>
+                            <LineChart data={chartData} margin={{ top: 5, right: 28, bottom: 44, left: 0 }}>
                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                                <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
                                <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} width={30} />
@@ -468,7 +468,7 @@ export default function Calculator() {
                                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                  labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
                                />
-                              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '18px' }} />
+                              <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '24px' }} />
                                <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" />
                                <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" />
                                <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" />
