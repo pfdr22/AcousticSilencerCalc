@@ -655,7 +655,7 @@ export default function Calculator() {
                     </div>
 
 
-                    {admin && (
+                    {admin?.role === 'admin' && (
                       <Accordion type="single" collapsible className="w-full mt-4">
                         <AccordionItem value="detalhes-preco" className="border rounded-lg px-4 bg-white dark:bg-card">
                           <AccordionTrigger className="hover:no-underline py-3">
