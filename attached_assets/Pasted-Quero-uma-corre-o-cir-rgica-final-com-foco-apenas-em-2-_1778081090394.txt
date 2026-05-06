@@ -1,0 +1,215 @@
+Quero uma correção cirúrgica final com foco apenas em 2 problemas concretos.
+Não quero refactor, não quero redesign, não quero alterações laterais.
+Quero somente corrigir estes 2 pontos e garantir que a versão publicada fica igual à versão correta de trabalho no Replit.
+
+Problema 1 — legenda preta e branca antiga no PDF
+No PDF da secção Ruído a Jusante (L_down) continua a aparecer um overlay residual da legenda antiga preta e branca por cima do gráfico a cores.
+
+O que continua a aparecer indevidamente
+Ainda aparecem estes elementos antigos:
+
+os textos pretos:
+
+Entrada
+
+Saída
+
+Regenerado
+
+os pequenos marcadores/ícones pretos associados a esses textos.
+
+O que quero
+Quero remover apenas esse overlay antigo da legenda preta e branca no PDF.
+
+O que deve ficar intacto
+Tem de ficar exatamente como está:
+
+o gráfico a cores;
+
+a legenda colorida correta em baixo;
+
+o tamanho do gráfico;
+
+a posição do gráfico;
+
+a caixa do gráfico;
+
+o resto do relatório.
+
+Instrução técnica
+No fluxo/template/DOM de exportação PDF:
+
+identifica o container residual da legenda antiga preta e branca;
+
+remove ou oculta apenas esse container antigo;
+
+não mexas no gráfico a cores;
+
+não mexas na legenda colorida nova;
+
+não recries o gráfico;
+
+não alteres o layout.
+
+Regra prática para identificar o elemento certo
+O elemento a remover é o que contém simultaneamente:
+
+os textos pretos Entrada / Saída / Regenerado
+
+e os pequenos símbolos pretos antigos
+
+posicionados por cima ou na zona superior/intermédia do gráfico.
+
+Problema 2 — detalhes de custos (Admin) a aparecer na versão publicada
+Na versão publicada, continua a aparecer informação reservada de administrador:
+
+“Ver detalhe de custos (Admin)”
+
+tanto no ecrã da aplicação;
+
+como também no print/PDF com preços.
+
+Isto não pode aparecer para utilizadores cliente.
+
+O que quero
+Quero eliminar completamente essa informação de admin da versão publicada para utilizadores não-admin.
+
+Muito importante
+Isto não pode ser só um display:none visual.
+Quero que esse bloco:
+
+não seja renderizado para cliente;
+
+não seja incluído no print/PDF do cliente;
+
+não apareça no deploy publicado se na versão de trabalho correta não aparece.
+
+Regra de segurança
+Se o role/permissão do utilizador não for conhecido com certeza, o comportamento seguro por defeito tem de ser:
+
+não mostrar informação de admin.
+
+Âmbitos onde tem de desaparecer
+Quero que o bloco “Ver detalhe de custos (Admin)” desapareça:
+
+no ecrã da aplicação para utilizador cliente;
+
+na versão publicada;
+
+no print/PDF com preços quando esse output é para cliente / não-admin.
+
+Problema 3 — deploy tem de ficar igual ao preview correto
+Neste momento há divergência entre:
+
+a versão correta de trabalho no Replit;
+
+a versão publicada/deploy.
+
+Isso não pode continuar.
+
+O que quero
+Quero que a versão publicada fique igual à versão correta do Replit no que toca a:
+
+visibilidade de informação admin;
+
+conteúdo renderizado no ecrã;
+
+conteúdo incluído no print/PDF.
+
+O que tens de verificar
+Verifica especificamente no deploy:
+
+fallback de role;
+
+utilizador default;
+
+mock admin;
+
+estado inicial incorreto;
+
+variável de ambiente;
+
+configuração de build/deploy;
+
+diferença entre preview e produção.
+
+Regra obrigatória
+Nunca assumir admin por defeito.
+Se houver dúvida, esconder conteúdo admin.
+
+Âmbito permitido
+Só tens autorização para mexer em:
+
+remoção do overlay antigo da legenda preta e branca no PDF;
+
+ocultação lógica do bloco Ver detalhe de custos (Admin) para não-admin;
+
+correção da divergência entre preview e versão publicada relativamente a esse comportamento.
+
+Proibição total
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+valores;
+
+preços;
+
+tabelas;
+
+gráfico a cores;
+
+legenda colorida nova;
+
+layout geral;
+
+outros textos;
+
+navegação;
+
+outros componentes;
+
+outras secções da aplicação.
+
+Ordem de execução obrigatória
+remover apenas o overlay antigo da legenda preta e branca no PDF;
+
+remover logicamente o bloco admin para cliente;
+
+alinhar a versão publicada com a versão correta do Replit;
+
+validar que nada mais mudou.
+
+Critérios de aceitação
+Só está concluído quando:
+
+desaparecem do PDF os textos pretos antigos Entrada / Saída / Regenerado e os seus marcadores pretos;
+
+o gráfico a cores e a legenda colorida permanecem intactos;
+
+o bloco Ver detalhe de custos (Admin) deixa de aparecer no ecrã publicado para cliente;
+
+o bloco admin deixa de aparecer também no print/PDF publicado para cliente;
+
+a versão publicada fica funcionalmente igual à versão correta no Replit;
+
+não foi alterado absolutamente mais nada.
+
+Validação final obrigatória
+Antes de concluir:
+
+testar no preview do Replit;
+
+testar na versão publicada/deploy;
+
+gerar o PDF com preços;
+
+confirmar que o overlay preto e branco desapareceu;
+
+confirmar que o bloco admin deixou de aparecer para cliente;
+
+confirmar que nada mais mudou.
