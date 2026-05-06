@@ -390,6 +390,34 @@
   height: auto !important;
 }
 
+.print-monochrome .print-l-down {
+  display: block !important;
+  width: 100% !important;
+}
+
+.print-monochrome .print-l-down-layout {
+  display: block !important;
+  width: 100% !important;
+}
+
+.print-monochrome .print-table-wrapper {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  float: none !important;
+  overflow: visible !important;
+}
+
+.print-monochrome .print-chart-wrapper {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  float: none !important;
+  clear: both !important;
+  margin-top: 16px !important;
+  overflow: visible !important;
+}
+
 .print-monochrome .print-chart > * {
   height: 180px !important;
   width: 100% !important;
@@ -397,8 +425,14 @@
 
 .print-monochrome .print-chart .recharts-responsive-container,
 .print-monochrome .print-chart .recharts-wrapper,
-.print-monochrome .print-chart .recharts-surface {
+.print-monochrome .print-chart .recharts-surface,
+.print-monochrome .print-table-wrapper,
+.print-monochrome .print-table-wrapper table {
   width: 100% !important;
+}
+
+.print-monochrome .print-table-wrapper table {
+  table-layout: fixed !important;
 }
 
 /* Show logo only in print mode */

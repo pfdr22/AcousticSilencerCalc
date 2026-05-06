@@ -406,14 +406,14 @@ export default function Calculator() {
 
                 {/* NEW DOWNSTREAM NOISE SECTION */}
                 {downstreamNoiseResult && (
-                   <Card className="mt-8 border-blue-200 dark:border-blue-800 shadow-md break-inside-avoid">
+                   <Card className="mt-8 border-blue-200 dark:border-blue-800 shadow-md break-inside-avoid print-l-down">
                      <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20 pb-4">
                        <CardTitle className="text-blue-700 dark:text-blue-400">Ruído a Jusante (L_down)</CardTitle>
                        <CardDescription>Nível sonoro final após silenciador, considerando atenuação e ruído regenerado.</CardDescription>
                      </CardHeader>
                      <CardContent className="pt-6">
-                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                         <div className="xl:col-span-2">
+                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 print-l-down-layout">
+                         <div className="xl:col-span-2 print-table-wrapper">
                            <Table>
                              <TableHeader>
                                <TableRow>
@@ -458,7 +458,7 @@ export default function Calculator() {
                            </Table>
                          </div>
                          
-                        <div className="print-chart h-[250px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800">
+                        <div className="print-chart h-[250px] w-full bg-white dark:bg-slate-950/50 rounded-lg p-2 border border-slate-100 dark:border-slate-800 print-chart-wrapper">
                            <ResponsiveContainer width="100%" height="100%">
                              <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />

@@ -1,0 +1,135 @@
+A alteração anterior não funcionou.
+Continua tudo na mesma no print/PDF: a coluna dos 8000 Hz continua cortada, o que prova que o bloco da tabela e do gráfico ainda está a ser renderizado lado a lado no output final.
+
+Quero que faças uma correção técnica e efetiva, apenas no print/PDF, para os dois botões:
+
+Exportar PDF (sem preços)
+
+Exportar PDF (com preços)
+
+Objetivo obrigatório
+No print/PDF:
+
+a tabela tem de ficar em cima;
+
+o gráfico tem de ficar por baixo;
+
+a tabela tem de usar a largura útil disponível;
+
+a coluna 8000 Hz tem de ficar totalmente visível.
+
+Muito importante
+Não alteres absolutamente mais nada.
+Não mexer em:
+
+lógica;
+
+cálculos;
+
+dados;
+
+valores;
+
+preços;
+
+layout normal do ecrã;
+
+textos;
+
+componentes fora do print/PDF.
+
+O que tens de fazer tecnicamente
+Não quero apenas “ajustar o layout”.
+Quero que identifiques o contentor exato da secção “Ruído a Jusante (L_down)” no template/export do PDF e que forces explicitamente o layout vertical no output final.
+
+Aplica uma destas abordagens, na estrutura real do código:
+
+css
+@media print {
+  .resultado-bloco,
+  .report-section,
+  .pdf-section,
+  .noise-summary-layout,
+  .l-down-layout {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .resultado-bloco .tabela,
+  .report-section .table-wrapper,
+  .pdf-section .table-wrapper,
+  .l-down-layout .table-wrapper {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    margin: 0 0 16px 0 !important;
+  }
+
+  .resultado-bloco .grafico,
+  .report-section .chart-wrapper,
+  .pdf-section .chart-wrapper,
+  .l-down-layout .chart-wrapper {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    clear: both !important;
+    margin-top: 16px !important;
+  }
+}
+Regras adicionais obrigatórias
+Além disso, no print/PDF tens de:
+
+remover qualquer display: flex, grid, float, columns, position, transform, ou largura fixa que esteja a manter o gráfico à direita;
+
+remover qualquer overflow: hidden ou largura limitada no contentor da tabela que esteja a cortar a última coluna;
+
+garantir que a tabela tem width: 100% e que o contentor não a está a comprimir;
+
+se o motor de PDF ignorar @media print, aplicar também a mesma classe/estilo diretamente no template HTML usado para exportação, ou adicionar uma classe tipo pdf-export / print-mode ao body durante a geração do PDF, porque alguns motores HTML-to-PDF ignoram ou duplicam mal os estilos de impressão.
+
+Instrução crítica
+Se o PDF estiver a ser gerado com uma biblioteca tipo html2pdf, html2canvas, ou semelhante, não assumes que @media print chega.
+Nesse caso, aplica também os estilos numa classe dedicada ao modo de exportação, por exemplo:
+
+css
+body.pdf-export .l-down-layout {
+  display: block !important;
+  width: 100% !important;
+}
+
+body.pdf-export .table-wrapper {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.pdf-export .chart-wrapper {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 16px !important;
+  clear: both !important;
+}
+e ativa essa classe antes de gerar o PDF, removendo-a no fim, porque alguns fluxos HTML-to-PDF ignoram estilos só definidos em @media print.
+
+Critério de aceitação
+Só está concluído quando:
+
+no PDF com preços o gráfico aparece por baixo da tabela;
+
+no PDF sem preços o gráfico aparece por baixo da tabela;
+
+a coluna 8000 Hz fica totalmente visível;
+
+não existe qualquer outra alteração fora do print/PDF.
+
+Validação final obrigatória
+No fim:
+
+gera os dois PDFs;
+
+confirma visualmente que o gráfico já não está ao lado da tabela;
+
+só depois marcas como concluído.
