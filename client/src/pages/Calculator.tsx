@@ -113,9 +113,9 @@ export default function Calculator() {
     if (chartImage) {
       const chartWrapper = element.querySelector('.print-chart-wrapper');
       if (chartWrapper) {
-        const existingChart = chartWrapper.querySelector('.pdf-chart-image');
-        if (existingChart) {
-          existingChart.remove();
+        const existingSvg = chartWrapper.querySelector('svg');
+        if (existingSvg) {
+          existingSvg.remove();
         }
         const img = document.createElement('img');
         img.src = chartImage.imageData;
