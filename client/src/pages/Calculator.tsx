@@ -94,9 +94,6 @@ export default function Calculator() {
     const element = resultsRef.current;
     if (!element) return;
 
-    const chartImage = await buildLDownPdfChartImage();
-    pdfExportImageRef.current = chartImage ? chartImage.imageData : null;
-
     element.classList.add('print-monochrome');
     if (!withPrice) {
       element.classList.add('print-no-price');
@@ -110,29 +107,42 @@ export default function Calculator() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
+    const chartImage = await buildLDownPdfChartImage();
+    pdfExportImageRef.current = chartImage ? chartImage.imageData : null;
+
     if (chartImage) {
-      const pdf = await html2pdf().from(element).set(opt).toPdf().get('pdf');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const usableWidth = pdfWidth - 20;
-      const chartHeight = (chartImage.imageHeight / chartImage.imageWidth) * usableWidth;
-      pdf.addImage(chartImage.imageData, 'PNG', 10, pdfHeight - chartHeight - 20, usableWidth, chartHeight);
-      pdf.save(opt.filename);
-      element.classList.remove('print-monochrome');
-      element.classList.remove('print-no-price');
-      pdfExportImageRef.current = null;
-      return;
+      const chartWrapper = element.querySelector('.print-chart-wrapper');
+      if (chartWrapper) {
+        const existingChart = chartWrapper.querySelector('.pdf-chart-image');
+        if (existingChart) {
+          existingChart.remove();
+        }
+        const img = document.createElement('img');
+        img.src = chartImage.imageData;
+        img.alt = 'Gráfico L_down';
+        img.className = 'pdf-chart-image';
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        chartWrapper.appendChild(img);
+      }
     }
 
     html2pdf().from(element).set(opt).save().then(() => {
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
       pdfExportImageRef.current = null;
+      const chartWrapper = element.querySelector('.print-chart-wrapper');
+      const inserted = chartWrapper?.querySelector('.pdf-chart-image');
+      inserted?.remove();
     }).catch((err: any) => {
       console.error("PDF Export Error:", err);
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
       pdfExportImageRef.current = null;
+      const chartWrapper = element.querySelector('.print-chart-wrapper');
+      const inserted = chartWrapper?.querySelector('.pdf-chart-image');
+      inserted?.remove();
     });
   };
 

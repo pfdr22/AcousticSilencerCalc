@@ -1,0 +1,156 @@
+Quero uma correção cirúrgica final ao PDF do relatório.
+
+Estado atual
+O gráfico a cores já está a ser gerado, mas foi colocado por cima da informação dos preços, o que está errado.
+O objetivo não era adicionar um novo gráfico noutro sítio nem sobrepor a imagem ao conteúdo existente.
+O objetivo era substituir o gráfico preto e branco existente pelo gráfico a cores, exatamente dentro da caixa correta já existente no relatório.
+
+O que tens de fazer
+Quero que no PDF da secção Ruído a Jusante (L_down):
+
+uses o gráfico a cores;
+
+mantenhas o gráfico na caixa correta já existente;
+
+substituas o gráfico antigo/preto e branco no mesmo local;
+
+não coloques a imagem do gráfico por cima do bloco dos preços;
+
+não adiciones um segundo gráfico;
+
+não cries um gráfico flutuante fora do contentor correto.
+
+Regra principal
+O gráfico a cores deve ocupar o lugar do gráfico antigo dentro da caixa já existente do relatório.
+Ou seja:
+
+mesma secção;
+
+mesmo contentor;
+
+mesma área reservada;
+
+apenas trocar o conteúdo interno da caixa do gráfico.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+preços;
+
+cálculos;
+
+fórmulas;
+
+dados;
+
+tabela;
+
+textos;
+
+layout do ecrã normal;
+
+permissões admin/cliente;
+
+qualquer outra secção do relatório;
+
+qualquer outro componente.
+
+Proibição explícita
+Não usar:
+
+position: absolute
+
+fixed
+
+coordenadas soltas
+
+inserção manual da imagem num ponto arbitrário da página
+
+overlay por cima de outros blocos
+
+Se estiveres a usar jsPDF, não quero que adiciones a imagem com coordenadas independentes da estrutura do relatório, porque foi isso que criou a sobreposição no bloco dos preços.
+
+Solução correta
+Quero que faças isto de forma segura:
+
+Opção preferida
+No template/HTML que é usado para gerar o PDF:
+
+identifica o contentor exato da caixa do gráfico;
+
+remove/substitui apenas o conteúdo interno desse contentor;
+
+insere dentro dessa mesma caixa a imagem do gráfico a cores;
+
+mantém o resto do layout intacto.
+
+Requisito estrutural
+A imagem do gráfico tem de estar:
+
+dentro do wrapper da caixa do gráfico;
+
+com width: 100% do contentor correto;
+
+com height: auto ou altura controlada do contentor;
+
+sem sair fora do fluxo;
+
+sem sobrepor preços nem outros blocos.
+
+Se estiveres a gerar o PDF a partir de HTML
+Quero que substituas o gráfico original no DOM de exportação antes da captura para PDF, em vez de colares uma imagem extra por cima da página.
+Isto é:
+
+criar a imagem do gráfico a cores;
+
+inserir essa imagem dentro da caixa já existente do gráfico;
+
+remover/ocultar o gráfico antigo nessa mesma caixa;
+
+só depois gerar o PDF.
+
+Se estiveres a usar jsPDF/addImage
+Só podes usar addImage(...) se a imagem for colocada com base nas coordenadas exatas da caixa do gráfico existente, e não numa posição manual aproximada na página, porque o addImage(imageData, format, x, y, width, height) depende explicitamente dessas coordenadas e dimensões.
+
+Se não conseguires garantir isso com precisão, então usa a abordagem DOM/template e captura a caixa correta já com o gráfico substituído.
+
+Objetivo visual exato
+No PDF final:
+
+continua a existir uma única caixa de gráfico na secção L_down;
+
+dentro dessa caixa aparece o gráfico a cores;
+
+o gráfico a cores substitui o antigo;
+
+os preços continuam no seu sítio normal;
+
+não existe sobreposição com qualquer outro conteúdo.
+
+Critério de aceitação
+Só está concluído quando:
+
+o gráfico a cores aparece na caixa correta da secção L_down;
+
+o gráfico preto e branco deixa de aparecer;
+
+os blocos de preços ficam intactos e sem sobreposição;
+
+não existe um segundo gráfico adicional;
+
+não foi alterado absolutamente mais nada.
+
+Validação final obrigatória
+Antes de concluir:
+
+gerar o PDF com preços;
+
+gerar o PDF sem preços;
+
+confirmar visualmente que o gráfico a cores está dentro da caixa correta;
+
+confirmar que os preços continuam visíveis e sem qualquer imagem por cima;
+
+confirmar que a única alteração foi a substituição do gráfico antigo pelo novo dentro do mesmo contentor.
