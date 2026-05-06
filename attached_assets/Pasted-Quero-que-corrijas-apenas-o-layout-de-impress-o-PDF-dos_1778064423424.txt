@@ -1,0 +1,70 @@
+Quero que corrijas apenas o layout de impressão/PDF dos dois printouts/exportações:
+
+Exportar PDF (sem preços)
+
+Exportar PDF (com preços)
+
+Problema a corrigir
+No PDF impresso/exportado, na secção da tabela de frequências, a coluna correspondente aos 8000 Hz está a desaparecer / ficar cortada no lado direito. No ecrã os dados existem, mas no print/PDF essa última coluna não fica totalmente visível.
+
+Objetivo
+Fazer com que a coluna dos 8000 Hz fique 100% visível nos dois printouts, sem cortar qualquer valor, sem esconder qualquer coluna e sem perder legibilidade.
+
+Solução permitida
+Podes apenas ajustar o layout do print/PDF para ganhar largura útil para a tabela.
+Por exemplo, uma solução aceitável é:
+
+mover o gráfico para baixo da tabela no modo de impressão/PDF;
+
+manter a tabela em toda a largura disponível;
+
+garantir que a coluna 8000 Hz aparece totalmente.
+
+Restrições críticas
+MUITO IMPORTANTE: não mexer em absolutamente mais NADA.
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+valores;
+
+lógica da aplicação;
+
+estilos do ecrã normal;
+
+nomes;
+
+ordem dos campos;
+
+conteúdo;
+
+layout fora do modo print/PDF;
+
+comportamento dos botões;
+
+preços;
+
+qualquer outra secção que já esteja correta.
+
+O que pretendo exatamente
+Corrigir só o CSS/layout de impressão ou a estrutura estritamente necessária do print template;
+
+Aplicar a correção aos dois PDFs: com preços e sem preços;
+
+Preservar o aspeto atual o máximo possível;
+
+Alterar apenas o mínimo indispensável para que a coluna dos 8000 Hz deixe de ser cortada.
+
+Critério de aceitação
+A tarefa só está concluída quando:
+
+no PDF sem preços a coluna 8000 Hz estiver totalmente visível;
+
+no PDF com preços a coluna 8000 Hz estiver totalmente visível;
+
+não houver qualquer outra alteração visual ou funcional fora dessa correção.
+
+Instrução final
+Antes de terminares, valida os dois printouts/PDFs e confirma que a única diferença introduzida foi a visibilidade completa da coluna dos 8000 Hz.

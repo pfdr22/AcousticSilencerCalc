@@ -383,6 +383,15 @@
   display: none !important;
 }
 
+.print-monochrome .print-chart {
+  margin-top: 1rem !important;
+  height: auto !important;
+}
+
+.print-monochrome .print-chart > * {
+  height: 180px !important;
+}
+
 /* Show logo only in print mode */
 .print-monochrome .pdf-logo {
   display: block !important;
