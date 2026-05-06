@@ -1,0 +1,94 @@
+A correção anterior não ficou resolvida.
+Nas imagens atuais vê-se que:
+
+na vista normal do software, a coluna 8000 Hz aparece corretamente;
+
+no print/PDF, a coluna 8000 Hz continua cortada;
+
+o gráfico continua ao lado da tabela no layout de impressão, portanto a alteração pedida não foi efetivamente aplicada.
+
+Quero que corrijas apenas e só o layout de impressão/PDF dos dois outputs:
+
+Exportar PDF (sem preços)
+
+Exportar PDF (com preços)
+
+O que tens de fazer
+No modo de impressão/PDF, coloca o gráfico por baixo da tabela, e não ao lado.
+A tabela tem de ocupar a largura útil disponível para que a coluna dos 8000 Hz fique totalmente visível, sem qualquer corte.
+
+Requisitos obrigatórios
+aplicar isto aos dois printouts: com preços e sem preços;
+
+no print/PDF, a secção da tabela e do gráfico deve ficar em layout vertical:
+
+tabela em cima;
+
+gráfico por baixo;
+
+garantir que a coluna 8000 Hz aparece inteira em todas as linhas;
+
+não usar uma “pseudo-correção” que deixe tudo na mesma.
+
+MUITO IMPORTANTE
+Não mexer em absolutamente mais NADA.
+
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+dados;
+
+valores;
+
+lógica;
+
+layout do ecrã normal;
+
+estilos gerais fora do print;
+
+conteúdos;
+
+textos;
+
+preços;
+
+ordem das secções;
+
+qualquer outro aspeto da aplicação.
+
+Implementação esperada
+A correção deve ser feita no CSS/layout específico de print/PDF, forçando explicitamente o bloco que contém:
+
+a tabela;
+
+o gráfico;
+
+a passar de disposição horizontal/lado a lado para disposição vertical/empilhada no print.
+
+Se necessário:
+
+definir o contentor do print com display: block ou flex-direction: column no @media print;
+
+dar width: 100% à tabela no print;
+
+colocar o gráfico com margem superior por baixo da tabela;
+
+remover qualquer largura fixa/coluna/grid que esteja a manter o gráfico à direita no modo print.
+
+Critério de aceitação
+Só consideres concluído quando:
+
+no PDF sem preços, a coluna 8000 Hz estiver totalmente visível;
+
+no PDF com preços, a coluna 8000 Hz estiver totalmente visível;
+
+no print, o gráfico estiver por baixo da tabela;
+
+nada mais tiver sido alterado.
+
+Validação final obrigatória
+Depois de aplicares a correção, gera e verifica os dois PDFs.
+Se o gráfico ainda aparecer ao lado da tabela, então a correção não está concluída.

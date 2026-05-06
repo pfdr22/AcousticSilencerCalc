@@ -385,11 +385,20 @@
 
 .print-monochrome .print-chart {
   margin-top: 1rem !important;
+  display: block !important;
+  width: 100% !important;
   height: auto !important;
 }
 
 .print-monochrome .print-chart > * {
   height: 180px !important;
+  width: 100% !important;
+}
+
+.print-monochrome .print-chart .recharts-responsive-container,
+.print-monochrome .print-chart .recharts-wrapper,
+.print-monochrome .print-chart .recharts-surface {
+  width: 100% !important;
 }
 
 /* Show logo only in print mode */
