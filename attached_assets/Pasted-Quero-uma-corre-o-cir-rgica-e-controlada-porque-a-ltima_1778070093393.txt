@@ -1,0 +1,137 @@
+Quero uma correção cirúrgica e controlada, porque a última alteração introduziu uma regressão grave.
+
+Problemas atuais
+O gráfico no PDF da secção Ruído a Jusante (L_down) continua sem ficar correto.
+
+Passou a aparecer no ecrã cliente informação de administrador, nomeadamente o bloco “Ver detalhe de custos (Admin)”, o que não pode acontecer em circunstância nenhuma.
+
+Prioridade absoluta
+A prioridade número 1 é esta:
+
+1. Reverter imediatamente a regressão de permissões/visibilidade
+No ecrã cliente, o bloco:
+
+“Ver detalhe de custos (Admin)”
+
+tem de voltar a ficar oculto exatamente como estava antes.
+Esse conteúdo não pode aparecer para clientes.
+
+Isto é obrigatório e tem de ficar corrigido antes de considerares qualquer outra parte da tarefa concluída.
+
+Segunda parte
+2. Corrigir apenas a exportação PDF do gráfico L_down
+Depois de restaurar a ocultação correta da informação de admin no ecrã cliente, quero corrigir apenas a exportação do gráfico da secção Ruído a Jusante (L_down) no PDF.
+
+Âmbito permitido
+Só tens autorização para mexer em:
+
+visibilidade/permissões do bloco admin que foi indevidamente exposto ao cliente;
+
+fluxo de exportação PDF do gráfico L_down.
+
+Proibição total
+Não podes mexer em mais nada.
+
+Não alterar:
+
+cálculos;
+
+fórmulas;
+
+valores;
+
+dados;
+
+tabela;
+
+preços;
+
+textos;
+
+layout normal do software, exceto para voltar a esconder o bloco admin no cliente;
+
+outras secções;
+
+outros componentes;
+
+qualquer lógica que não seja estritamente necessária para:
+
+esconder novamente a informação admin do cliente;
+
+corrigir o gráfico no PDF.
+
+Instrução de implementação
+Quero que faças isto de forma segura:
+
+Parte A — restaurar comportamento de cliente/admin
+identificar exatamente onde a alteração anterior expôs o bloco admin;
+
+restaurar a condição original de renderização/visibilidade;
+
+garantir que o bloco “Ver detalhe de custos (Admin)” só aparece para admin;
+
+garantir que no perfil cliente esse bloco não aparece nem no ecrã nem por CSS apenas visual, mas sim logicamente oculto.
+
+Parte B — gráfico PDF
+Para o gráfico no PDF:
+
+não reutilizar o gráfico pequeno atual do ecrã;
+
+criar uma versão dedicada para exportação;
+
+gerar o gráfico como imagem estática a cores;
+
+usar as mesmas cores do software;
+
+inserir essa imagem no PDF com largura explícita correta;
+
+manter o gráfico por baixo da tabela.
+
+Regra de segurança obrigatória
+Se existirem alterações anteriores que tocaram em ficheiros fora deste âmbito, quero que faças rollback dessas alterações indevidas e mantenhas apenas o que for estritamente necessário para estas duas correções:
+
+esconder novamente o painel admin no cliente;
+
+corrigir o gráfico no PDF.
+
+Ordem de trabalho
+Executa por esta ordem:
+
+corrigir a regressão de visibilidade admin no cliente;
+
+corrigir a exportação PDF do gráfico;
+
+validar os dois pontos;
+
+não mexer em mais nada.
+
+Critérios de aceitação
+Só está concluído quando:
+
+o bloco “Ver detalhe de custos (Admin)” deixa de aparecer no ecrã cliente;
+
+o gráfico L_down continua presente no PDF;
+
+o gráfico aparece a cores;
+
+usa as mesmas cores do software;
+
+aparece com tamanho correto e legível no PDF;
+
+a legenda não fica sobreposta;
+
+nada mais foi alterado.
+
+Validação final obrigatória
+Antes de concluir:
+
+validar visualmente o ecrã cliente para confirmar que o bloco admin desapareceu;
+
+gerar o PDF com preços;
+
+gerar o PDF sem preços;
+
+confirmar visualmente que a única alteração adicional foi a correção do gráfico no PDF.
+
+Frase final forte
+Se para corrigir o gráfico voltares a expor informação de admin ao cliente, a tarefa é considerada errada. A segurança de visibilidade por perfil é inegociável.

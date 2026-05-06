@@ -95,7 +95,7 @@ export default function Calculator() {
     if (!element) return;
 
     const chartImage = await buildLDownPdfChartImage();
-    pdfExportImageRef.current = chartImage;
+    pdfExportImageRef.current = chartImage ? chartImage.imageData : null;
 
     element.classList.add('print-monochrome');
     if (!withPrice) {
@@ -109,6 +109,20 @@ export default function Calculator() {
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
+
+    if (chartImage) {
+      const pdf = await html2pdf().from(element).set(opt).toPdf().get('pdf');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const usableWidth = pdfWidth - 20;
+      const chartHeight = (chartImage.imageHeight / chartImage.imageWidth) * usableWidth;
+      pdf.addImage(chartImage.imageData, 'PNG', 10, pdfHeight - chartHeight - 20, usableWidth, chartHeight);
+      pdf.save(opt.filename);
+      element.classList.remove('print-monochrome');
+      element.classList.remove('print-no-price');
+      pdfExportImageRef.current = null;
+      return;
+    }
 
     html2pdf().from(element).set(opt).save().then(() => {
       element.classList.remove('print-monochrome');
@@ -213,7 +227,7 @@ export default function Calculator() {
       ctx.fillText(item.label, baseX + 22, legendY + 1);
     });
 
-    return { imageData: canvas.toDataURL('image/png'), imageWidth: 190, imageHeight: 62 };
+    return { imageData: canvas.toDataURL('image/png'), imageWidth: 1280, imageHeight: 420 };
   };
 
   const calculations = useMemo(() => {
