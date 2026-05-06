@@ -107,42 +107,15 @@ export default function Calculator() {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    const chartImage = await buildLDownPdfChartImage();
-    pdfExportImageRef.current = chartImage ? chartImage.imageData : null;
-
-    if (chartImage) {
-      const chartWrapper = element.querySelector('.print-chart-wrapper');
-      if (chartWrapper) {
-        const existingChart = chartWrapper.querySelector('.pdf-chart-image');
-        if (existingChart) {
-          existingChart.remove();
-        }
-        const img = document.createElement('img');
-        img.src = chartImage.imageData;
-        img.alt = 'Gráfico L_down';
-        img.className = 'pdf-chart-image';
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.display = 'block';
-        chartWrapper.appendChild(img);
-      }
-    }
-
     html2pdf().from(element).set(opt).save().then(() => {
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
       pdfExportImageRef.current = null;
-      const chartWrapper = element.querySelector('.print-chart-wrapper');
-      const inserted = chartWrapper?.querySelector('.pdf-chart-image');
-      inserted?.remove();
     }).catch((err: any) => {
       console.error("PDF Export Error:", err);
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
       pdfExportImageRef.current = null;
-      const chartWrapper = element.querySelector('.print-chart-wrapper');
-      const inserted = chartWrapper?.querySelector('.pdf-chart-image');
-      inserted?.remove();
     });
   };
 
