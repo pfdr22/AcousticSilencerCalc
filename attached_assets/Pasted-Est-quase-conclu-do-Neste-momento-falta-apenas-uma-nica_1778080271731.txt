@@ -1,0 +1,138 @@
+Está quase concluído.
+Neste momento falta apenas uma única correção no PDF:
+
+O único problema que resta
+Na secção Ruído a Jusante (L_down) continuam a aparecer 3 palavras residuais da legenda antiga preta e branca:
+
+Entrada
+
+Saída
+
+Regenerado
+
+Quero remover somente essas 3 palavras antigas do PDF.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+gráfico a cores;
+
+legenda colorida atual;
+
+tabela;
+
+valores;
+
+preços;
+
+layout;
+
+permissões;
+
+bloco admin;
+
+qualquer outra secção;
+
+qualquer outro texto.
+
+O que deve ficar exatamente como está
+Tem de ficar intacto:
+
+o gráfico a cores;
+
+a legenda a cores em baixo;
+
+toda a caixa do gráfico;
+
+o resto do relatório;
+
+o resto da aplicação.
+
+O que quero remover exatamente
+Quero remover somente estes 3 labels antigos da legenda preta e branca residual:
+
+Entrada
+
+Saída
+
+Regenerado
+
+Atenção:
+
+só os 3 textos antigos;
+
+não remover a legenda colorida nova;
+
+não remover o gráfico;
+
+não remover outros textos do relatório.
+
+Instrução técnica exata
+No fluxo/template/DOM usado para o PDF:
+
+identifica o overlay residual antigo que contém esses 3 textos;
+
+remove ou oculta apenas esses 3 labels antigos;
+
+não toques em nenhum outro elemento.
+
+Se precisares de ser ainda mais específico
+Procura no bloco do gráfico L_down os nós/elementos de texto que contenham exatamente:
+
+Entrada
+
+Saída
+
+Regenerado
+
+e que pertençam à legenda preta e branca antiga / overlay antigo, não à legenda colorida atual.
+
+Remove apenas esses 3 nós de texto do PDF.
+
+Proibição explícita
+Não fazer nenhuma destas coisas:
+
+não regenerar o gráfico;
+
+não mexer no tamanho do gráfico;
+
+não mexer na imagem colorida;
+
+não mexer na legenda nova;
+
+não esconder toda a secção;
+
+não voltar a tocar em permissões;
+
+não alterar mais nada na aplicação.
+
+Critério de aceitação
+Só está concluído quando:
+
+desaparecem do PDF as 3 palavras antigas:
+
+Entrada
+
+Saída
+
+Regenerado
+
+o gráfico a cores continua igual;
+
+a legenda colorida continua igual;
+
+nada mais foi alterado.
+
+Versão curta
+Falta apenas remover do PDF da secção L_down estas 3 palavras antigas da legenda preta e branca residual:
+
+Entrada
+
+Saída
+
+Regenerado
+
+Mantém intacto o gráfico a cores e a legenda colorida atual.
+Não alteres absolutamente mais nada.

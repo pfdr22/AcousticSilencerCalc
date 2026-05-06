@@ -590,9 +590,9 @@ export default function Calculator() {
                                  labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
                                />
                               <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '24px' }} />
-                              <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" hide={!!pdfExportImageRef.current} />
-                              <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" hide={!!pdfExportImageRef.current} />
-                              <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" hide={!!pdfExportImageRef.current} />
+                              <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" />
+                              <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" />
+                              <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" />
                              </LineChart>
                            </ResponsiveContainer>
                          </div>
