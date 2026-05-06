@@ -1,0 +1,85 @@
+Atenção: a versão dentro do Replit está correta.
+O problema está apenas na versão publicada/deploy, onde voltou a aparecer o gráfico antigo preto e branco.
+
+Regra absoluta
+Não mexer na versão de trabalho que está correta dentro do Replit.
+Não alterar o componente normal, não alterar o gráfico correto, não alterar layout, não alterar mais nada.
+
+O único problema a resolver
+Na versão publicada, no PDF / output da secção Ruído a Jusante (L_down), voltou a aparecer o gráfico antigo preto e branco / overlay antigo preto.
+
+Quero que removas apenas esse gráfico/overlay antigo preto da versão publicada.
+
+O que quero exatamente
+Quero que a versão publicada fique igual à versão correta que vejo dentro do Replit.
+
+Isso significa:
+
+manter o gráfico correto atual;
+
+remover o gráfico antigo preto e branco / overlay antigo preto que reapareceu;
+
+não tocar em mais nada.
+
+Muito importante
+Não alterar a versão de trabalho correta dentro do Replit.
+Apenas corrigir o que está a sair errado na versão publicada.
+
+Instrução técnica obrigatória
+Quero que trates isto como problema de deploy/build/snapshot/cache, não como problema do componente correto atual.
+
+O que tens de verificar
+se a versão publicada está a usar um snapshot/build antigo;
+
+se o deploy está a servir ficheiros/bundle antigos em cache;
+
+se existe divergência entre o que o preview usa e o que o deploy publica;
+
+se o output publicado ainda está a usar o template antigo do gráfico preto e branco.
+
+O que tens de fazer
+garantir que o deploy publicado usa exatamente os ficheiros atuais corretos;
+
+remover do output publicado o gráfico antigo preto e branco;
+
+republicar usando a versão correta atual;
+
+se necessário, fazer rollback do deploy publicado errado e promover o build correto.
+
+Proibição explícita
+Não fazer nenhuma destas coisas:
+
+não alterar o gráfico correto atual no Replit;
+
+não voltar a mexer no layout do PDF;
+
+não mexer em preços;
+
+não mexer em permissões;
+
+não mexer na tabela;
+
+não mexer em mais nada da aplicação.
+
+Objetivo final
+A versão publicada deve ficar igual à versão correta do Replit, sem o gráfico antigo preto e branco.
+
+Critério de aceitação
+Só está concluído quando:
+
+a versão dentro do Replit continua igual e correta;
+
+na versão publicada deixa de aparecer o gráfico antigo preto e branco;
+
+a versão publicada fica igual à versão correta do Replit;
+
+nada mais foi alterado.
+
+Validação final obrigatória
+Antes de concluir:
+
+comparar a versão dentro do Replit com a versão publicada;
+
+confirmar visualmente que o gráfico antigo preto e branco desapareceu da versão publicada;
+
+confirmar que nada mais mudou.
