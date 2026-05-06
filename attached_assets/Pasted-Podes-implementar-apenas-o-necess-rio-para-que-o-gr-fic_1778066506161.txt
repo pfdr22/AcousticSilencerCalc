@@ -1,0 +1,93 @@
+Podes implementar apenas o necessário para que o gráfico da secção Ruído a Jusante (L_down) seja exportado corretamente no PDF através de uma renderização separada para imagem, mantendo o resto intacto.
+
+O que está autorizado
+Fica autorizado somente isto, no contexto da exportação PDF:
+
+criar uma função dedicada de exportação do gráfico;
+
+criar um canvas temporário ou chart temporário;
+
+renderizar uma versão de exportação do gráfico com tamanho fixo adequado;
+
+converter essa versão para imagem (toBase64Image() / toDataURL());
+
+inserir essa imagem no PDF no lugar do gráfico mal renderizado.
+
+Requisitos obrigatórios
+Essa versão exportada do gráfico tem de:
+
+aparecer no PDF;
+
+ficar por baixo da tabela;
+
+sair a cores;
+
+usar as mesmas cores do software para cada linha;
+
+ficar larga e legível;
+
+ter a legenda legível e sem sobreposição.
+
+O que NÃO está autorizado
+Não podes alterar:
+
+cálculos;
+
+fórmulas;
+
+dados;
+
+valores;
+
+tabela;
+
+layout normal da aplicação;
+
+textos;
+
+preços;
+
+lógica da aplicação fora da exportação PDF;
+
+qualquer outra secção;
+
+qualquer outro componente.
+
+Regra de segurança
+Se para fazer isto precisares de alterar algo fora do fluxo estritamente necessário da exportação PDF do gráfico, não o faças.
+
+Implementação desejada
+Quero que cries algo do género:
+
+buildLDownPdfChartImage()
+
+generateLDownChartForPdf()
+
+E que isso seja usado só no momento de gerar o PDF.
+
+Não reutilizes diretamente o gráfico pequeno do ecrã.
+Cria uma versão própria de exportação, com dimensões fixas adequadas, converte para imagem e coloca essa imagem no relatório final.
+
+Critério de aceitação
+Só está concluído quando:
+
+o gráfico continua presente no PDF;
+
+o gráfico aparece a cores;
+
+as cores são as mesmas do software;
+
+o gráfico fica largo e legível;
+
+a legenda não fica sobreposta;
+
+nada mais foi alterado.
+
+Validação final
+Antes de dares como concluído:
+
+gera o PDF com preços;
+
+gera o PDF sem preços;
+
+confirma visualmente que a única alteração foi a forma como o gráfico é exportado.

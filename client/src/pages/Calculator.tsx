@@ -88,15 +88,16 @@ export default function Calculator() {
   const [finalPriceResult, setFinalPriceResult] = useState<FinalPriceResult | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const pdfChartRef = useRef<HTMLDivElement>(null);
+  const pdfExportImageRef = useRef<string | null>(null);
 
-  const handleExportPDF = (withPrice: boolean = true) => {
+  const handleExportPDF = async (withPrice: boolean = true) => {
     const element = resultsRef.current;
     if (!element) return;
 
-    // Add monochrome class for B&W export
+    const chartImage = await buildLDownPdfChartImage();
+    pdfExportImageRef.current = chartImage;
+
     element.classList.add('print-monochrome');
-    
-    // Hide price if requested
     if (!withPrice) {
       element.classList.add('print-no-price');
     }
@@ -112,11 +113,107 @@ export default function Calculator() {
     html2pdf().from(element).set(opt).save().then(() => {
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
+      pdfExportImageRef.current = null;
     }).catch((err: any) => {
       console.error("PDF Export Error:", err);
       element.classList.remove('print-monochrome');
       element.classList.remove('print-no-price');
+      pdfExportImageRef.current = null;
     });
+  };
+
+  const buildLDownPdfChartImage = async () => {
+    if (!downstreamNoiseResult) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = 1100;
+    canvas.height = 380;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(70, 30);
+    ctx.lineTo(70, 290);
+    ctx.lineTo(1040, 290);
+    ctx.stroke();
+
+    const labels = FREQUENCIES;
+    const series = [
+      { name: 'Entrada', color: '#94a3b8', values: labels.map(f => downstreamNoiseResult.bandas[f]?.L_up ?? 0) },
+      { name: 'Saída', color: '#2563eb', values: labels.map(f => downstreamNoiseResult.bandas[f]?.L_down ?? 0) },
+      { name: 'Regenerado', color: '#f59e0b', values: labels.map(f => downstreamNoiseResult.bandas[f]?.L_reg ?? 0) },
+    ];
+    const allValues = series.flatMap(s => s.values);
+    const minValue = Math.min(...allValues) - 5;
+    const maxValue = Math.max(...allValues) + 5;
+    const plotLeft = 80;
+    const plotTop = 25;
+    const plotWidth = 950;
+    const plotHeight = 245;
+    const xStep = plotWidth / (labels.length - 1);
+
+    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'center';
+    labels.forEach((label, index) => {
+      const x = plotLeft + index * xStep;
+      ctx.fillText(label, x, 315);
+    });
+
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i += 1) {
+      const value = minValue + ((maxValue - minValue) / 5) * i;
+      const y = plotTop + plotHeight - ((value - minValue) / (maxValue - minValue)) * plotHeight;
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(value.toFixed(0), 62, y + 4);
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.beginPath();
+      ctx.moveTo(plotLeft, y);
+      ctx.lineTo(plotLeft + plotWidth, y);
+      ctx.stroke();
+    }
+
+    series.forEach(({ color, values }) => {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      values.forEach((value, index) => {
+        const x = plotLeft + index * xStep;
+        const y = plotTop + plotHeight - ((value - minValue) / (maxValue - minValue)) * plotHeight;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      values.forEach((value, index) => {
+        const x = plotLeft + index * xStep;
+        const y = plotTop + plotHeight - ((value - minValue) / (maxValue - minValue)) * plotHeight;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    });
+
+    const legendY = 340;
+    const legendItems = [
+      { label: 'Entrada', color: '#94a3b8' },
+      { label: 'Saída', color: '#2563eb' },
+      { label: 'Regenerado', color: '#f59e0b' },
+    ];
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'left';
+    legendItems.forEach((item, index) => {
+      const baseX = 320 + index * 210;
+      ctx.fillStyle = item.color;
+      ctx.fillRect(baseX, legendY - 10, 14, 14);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText(item.label, baseX + 22, legendY + 1);
+    });
+
+    return canvas.toDataURL('image/png');
   };
 
   const calculations = useMemo(() => {
