@@ -1,0 +1,143 @@
+Sim — a imagem mostra que já não falta remover o gráfico, nem a legenda colorida nova; o que continua visível são apenas 3 itens residuais da legenda antiga preta e branca, colocados dentro/por baixo da caixa do gráfico: os textos “Entrada”, “Saída”, “Regenerado” e os respetivos pequenos símbolos pretos de linha com marcador. Portanto, o prompt tem de mandar o Replit deixar intacto o gráfico colorido novo e remover só esse overlay residual da legenda antiga, sem tocar em mais nada.
+
+Prompt muito elucidativo
+Atenção: o PDF está praticamente correto.
+Não quero refazer o gráfico, não quero mexer na tabela, não quero reposicionar nada.
+
+O único problema que ainda existe
+Na secção Ruído a Jusante (L_down) do PDF, continuam visíveis apenas restos da legenda antiga do gráfico preto e branco.
+
+Esses restos são exatamente estes 3 itens residuais:
+
+texto preto “Entrada” + respetivo pequeno ícone preto;
+
+texto preto “Saída” + respetivo pequeno ícone preto;
+
+texto preto “Regenerado” + respetivo pequeno ícone preto.
+
+O que quero que fique
+Quero manter intacto:
+
+o gráfico colorido novo;
+
+a legenda colorida nova do gráfico;
+
+a caixa atual do gráfico;
+
+todo o resto do PDF.
+
+O que quero remover
+Quero remover somente a legenda residual antiga a preto e branco que ainda está por cima / na zona intermédia do bloco do gráfico.
+
+Ou seja, no PDF final devem desaparecer apenas:
+
+os 3 textos pretos antigos:
+
+Entrada
+
+Saída
+
+Regenerado
+
+os 3 pequenos símbolos pretos antigos que estão ao lado desses textos.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+o gráfico a cores;
+
+a legenda a cores;
+
+a tabela;
+
+os valores;
+
+os preços;
+
+o layout;
+
+a caixa do gráfico;
+
+a posição do gráfico;
+
+qualquer outra secção;
+
+qualquer lógica;
+
+qualquer permissão;
+
+o ecrã normal da aplicação.
+
+Instrução técnica exata
+Quero que procures no fluxo/template do PDF o elemento residual da legenda antiga do gráfico preto e branco.
+
+Provavelmente será um destes casos:
+
+um bloco HTML antigo que ainda está a ser renderizado;
+
+um overlay separado da legenda antiga;
+
+um segundo container de legenda;
+
+um fragmento SVG/DOM antigo que não foi removido;
+
+uma legenda manual antiga independente do gráfico novo.
+
+O que tens de fazer tecnicamente
+Identificar o container exato da legenda antiga preta e branca.
+
+Não tocar no gráfico a cores novo.
+
+Não tocar na legenda a cores nova.
+
+Remover ou ocultar apenas esse bloco antigo residual no PDF.
+
+Se precisares de uma forma objetiva de o identificar
+Remove apenas o elemento que contém simultaneamente:
+
+os labels pretos Entrada / Saída / Regenerado
+
+e os pequenos ícones pretos de linha com círculo
+
+e que está localizado na zona intermédia do bloco do gráfico, acima da legenda colorida nova.
+
+Proibição explícita
+Não faças nenhuma destas coisas:
+
+não recriar o gráfico;
+
+não regenerar novamente o layout inteiro;
+
+não mover o gráfico;
+
+não mexer na imagem colorida;
+
+não remover a legenda colorida de baixo;
+
+não alterar tamanhos;
+
+não alterar espaçamentos.
+
+Objetivo visual final
+No PDF final da secção L_down deve existir:
+
+o gráfico colorido novo;
+
+a legenda colorida nova, em baixo;
+
+nenhum vestígio da legenda preta e branca antiga.
+
+Critério de aceitação
+Só está concluído quando:
+
+desaparecem os 3 textos pretos antigos (Entrada / Saída / Regenerado);
+
+desaparecem os 3 pequenos ícones pretos antigos;
+
+o gráfico colorido continua exatamente igual;
+
+a legenda colorida continua exatamente igual;
+
+nada mais foi alterado.

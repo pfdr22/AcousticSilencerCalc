@@ -589,7 +589,7 @@ export default function Calculator() {
                                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                  labelStyle={{ fontWeight: 'bold', color: '#64748b' }}
                                />
-                              <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '24px' }} />
+                              <Legend content={() => null} />
                               <Line type="monotone" dataKey="Upstream" stroke="#94a3b8" strokeWidth={2} dot={{r: 3}} name="Entrada" hide={!!pdfExportImageRef.current} />
                               <Line type="monotone" dataKey="Downstream" stroke="#2563eb" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} name="Saída" hide={!!pdfExportImageRef.current} />
                               <Line type="monotone" dataKey="Regenerated" stroke="#f59e0b" strokeDasharray="5 5" strokeWidth={2} dot={false} name="Regenerado" hide={!!pdfExportImageRef.current} />
