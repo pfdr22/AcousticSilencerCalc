@@ -1,0 +1,70 @@
+Quero fazer apenas uma melhoria no gráfico do print/PDF da secção Ruído a Jusante (L_down).
+A correção anterior da tabela está resolvida; agora o único problema é que o gráfico ficou demasiado pequeno dentro da caixa e as legendas ficam sobrepostas, o que prejudica a leitura.
+
+O que quero
+No print/PDF:
+
+aumentar a largura útil do gráfico para ocupar melhor a largura da folha;
+
+fazer o gráfico ficar mais largo e mais legível;
+
+garantir que as legendas deixam de ficar sobrepostas;
+
+manter o gráfico por baixo da tabela.
+
+Ajuste pretendido
+Quero que o gráfico use praticamente toda a largura disponível do bloco no PDF, com uma altura proporcional adequada.
+Também quero que a zona da legenda tenha espaço suficiente, para que “Entrada”, “Saída” e “Regenerado” não se sobreponham.
+
+Implementação esperada
+No layout de print/PDF, ajusta só o bloco do gráfico:
+
+aumentar a largura do contentor do gráfico para perto de 100%;
+
+aumentar a área útil interna do canvas/SVG;
+
+reservar mais espaço inferior para a legenda;
+
+se necessário, colocar a legenda mais abaixo ou com maior espaçamento horizontal;
+
+se a biblioteca permitir, reduzir ligeiramente o tamanho da fonte da legenda apenas no PDF para evitar sobreposição, mas sem alterar o resto.
+
+Muito importante
+Não mexer em absolutamente mais nada.
+
+Não alterar:
+
+tabela;
+
+valores;
+
+cálculos;
+
+lógica;
+
+textos;
+
+layout do ecrã normal;
+
+posição da tabela;
+
+posição global da secção;
+
+qualquer outro componente.
+
+Critério de aceitação
+Só está concluído quando:
+
+o gráfico continua por baixo da tabela;
+
+o gráfico fica mais largo, ocupando melhor a largura da folha;
+
+as legendas deixam de estar sobrepostas;
+
+não existe qualquer outra alteração.
+
+Versão curta
+Quero apenas melhorar o gráfico no print/PDF da secção Ruído a Jusante (L_down).
+Mantém tudo como está, mas faz o gráfico ficar mais largo, a ocupar melhor a largura da folha, e garante que as legendas deixam de ficar sobrepostas.
+O gráfico deve continuar por baixo da tabela.
+Não alteres absolutamente mais nada.
