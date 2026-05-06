@@ -113,10 +113,15 @@ export default function Calculator() {
     if (chartImage) {
       const chartWrapper = element.querySelector('.print-chart-wrapper');
       if (chartWrapper) {
-        const existingSvg = chartWrapper.querySelector('svg');
-        if (existingSvg) {
-          existingSvg.remove();
-        }
+        const oldLegend = chartWrapper.querySelector('.recharts-legend-wrapper');
+        if (oldLegend) oldLegend.remove();
+        const oldTexts = chartWrapper.querySelectorAll('.recharts-layer text');
+        oldTexts.forEach((node) => {
+          const text = node.textContent?.trim();
+          if (text === 'Entrada' || text === 'Saída' || text === 'Regenerado') {
+            node.remove();
+          }
+        });
         const img = document.createElement('img');
         img.src = chartImage.imageData;
         img.alt = 'Gráfico L_down';
@@ -124,6 +129,7 @@ export default function Calculator() {
         img.style.width = '100%';
         img.style.height = 'auto';
         img.style.display = 'block';
+        img.style.marginTop = '-18px';
         chartWrapper.appendChild(img);
       }
     }

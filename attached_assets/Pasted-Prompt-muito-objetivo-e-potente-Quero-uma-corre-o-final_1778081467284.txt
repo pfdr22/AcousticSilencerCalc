@@ -1,0 +1,138 @@
+Prompt muito objetivo e potente
+Quero uma correção final ultra-cirúrgica no PDF da secção Ruído a Jusante (L_down).
+
+Só existem 2 ajustes a fazer
+1. Remover o overlay preto residual
+Dentro da caixa do gráfico continuam a aparecer elementos antigos pretos que já não devem existir.
+
+Quero remover somente estes 6 elementos pretos residuais:
+
+os 3 textos pretos:
+
+Entrada
+
+Saída
+
+Regenerado
+
+os 3 pequenos marcadores/ícones pretos que estão por cima desses textos.
+
+Muito importante sobre este ponto
+não remover a legenda colorida de baixo;
+
+não remover o gráfico a cores;
+
+não remover nenhum outro texto do relatório;
+
+não recriar o gráfico;
+
+não alterar mais nada.
+
+2. Puxar o gráfico colorido para cima
+Depois de remover esse overlay preto residual, quero que o gráfico colorido dentro da caixa seja puxado para cima, para ocupar melhor a área útil da caixa.
+
+O que isto significa exatamente
+reduzir o espaço vazio no topo da caixa;
+
+subir o gráfico colorido;
+
+manter o gráfico dentro da mesma caixa;
+
+manter o mesmo gráfico, a mesma largura e a mesma legenda colorida em baixo;
+
+apenas ajustar o posicionamento vertical para cima.
+
+Instrução técnica exata
+Parte A — remover apenas o overlay preto residual
+No fluxo/template/DOM do PDF, identifica o elemento residual antigo que contém:
+
+os textos pretos Entrada / Saída / Regenerado
+
+e os pequenos marcadores pretos acima desses textos
+
+Esse é o único bloco que quero remover/ocultar.
+
+Não tocar:
+
+na legenda colorida de baixo;
+
+no gráfico colorido;
+
+na caixa principal.
+
+Parte B — subir apenas o gráfico colorido
+Depois de remover o overlay preto residual, ajusta apenas o posicionamento vertical do gráfico colorido dentro da caixa:
+
+menos margem/padding superior;
+
+menos espaço morto acima do gráfico;
+
+gráfico visualmente mais alto dentro do container.
+
+Importante
+Não quero:
+
+redimensionamento geral do PDF;
+
+mudança de layout;
+
+alteração da largura do gráfico;
+
+alteração da legenda colorida;
+
+mudança de tabelas;
+
+mudança de preços;
+
+mudança de qualquer outra secção.
+
+Proibição total
+NÃO MEXER MESMO EM MAIS NADA.
+
+Não alterar:
+
+tabela;
+
+cálculos;
+
+fórmulas;
+
+valores;
+
+textos;
+
+preços;
+
+legenda colorida;
+
+estrutura do relatório;
+
+permissões;
+
+deploy;
+
+ecrã da aplicação;
+
+qualquer outro componente.
+
+Critérios de aceitação
+Só está concluído quando:
+
+desaparecem os 3 textos pretos antigos:
+
+Entrada
+
+Saída
+
+Regenerado
+
+desaparecem os 3 pequenos marcadores pretos antigos;
+
+o gráfico colorido continua igual;
+
+a legenda colorida continua igual;
+
+o gráfico colorido fica mais acima dentro da caixa;
+
+nada mais foi alterado.
+
